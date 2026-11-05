@@ -1,23 +1,30 @@
-# Environments, builds, and development caches
+# Python environments
 .venv/
 **/.venv/
+
+# Python bytecode
 __pycache__/
 *.py[cod]
+
+# Test and lint caches
 .pytest_cache/
 .ruff_cache/
+
+# Build artifacts
 dist/
 *.egg-info/
 
-# Local agent state and credentials
+# Local AI tooling
 /.agents/
 /.codex/
-/.aws/
 /.gstack/
-
-# Keep shared Claude configuration and hooks; ignore local overrides and state
 /.claude/*
+# Shared Claude configuration and hooks remain tracked
 !/.claude/settings.json
 !/.claude/hooks/
 
-# data files
+# Local credentials
+/.aws/
+
+# Project data
 /data/
