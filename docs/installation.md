@@ -4,12 +4,12 @@
 
 使用支持 SocketCAN 的 Linux、PiPER-X/AGX 夹爪、USB-CAN 与 GELLO Dynamixel 主手。软件工具为 Git、pyenv、uv、iproute2、FFmpeg、编译工具和 lsof。系统包与转换依赖在 converter 环境中验证，不进入实时控制环境。
 
-controller/GELLO/SDK/camera 的开发解释器是 Python 3.11；converter 是 3.12。根目录的 `requires-python` 当前限制为 `>=3.11,<3.12`，与 GELLO 包一致。
+controller 与五个子模块统一使用 Python 3.12。根目录的 `requires-python` 当前限制为 `>=3.12,<3.13`，与 GELLO 包一致。
 
 ## 一键配置
 
 ```bash
-git clone git@github.com:KnightOrNot/agilex-controller.git
+git clone --branch dev git@github.com:KnightOrNot/agilex-controller.git
 cd agilex-controller
 ./scripts/setup.sh
 ```
@@ -24,7 +24,7 @@ uv run agilex-data-collection setup
 
 它同步 `third-party/agilex-adapters/.venv`，安装 LeRobot（官方 v0.6.0）、LeLab（固定提交）
 和网页依赖，并构建前端，需要网络和 Node。默认 Python 3.12.14；已有完整解释器
-可用 `setup --python /path/to/python3.12`。根目录的 Python 3.11 环境不会安装
+可用 `setup --python /path/to/python3.12`。根目录的 Python 3.12 环境不会安装
 这些依赖，两个环境互不替换。
 
 常用参数：
@@ -37,7 +37,8 @@ uv run agilex-data-collection setup
 | `--gello-extra NAME` | 仅为 GELLO 独立环境安装可选 camera/simulation/robots/full |
 | `--with-simulation-assets` | 显式下载 GELLO 的 MuJoCo Menagerie |
 
-控制只需要 GELLO 基础依赖；RealSense 使用单独的 camera-realsense 库，不需要 GELLO 的 camera extra。默认安装不下载仿真模型。
+控制只需要 GELLO 基础依赖；RealSense 使用单独的 camera-realsense 库，不需要 GELLO 的 camera extra。默认安装不下载仿真模型。GELLO 的 `simulation` / `full` 额外约束
+`pin==3.7.0` 对应的 urdfdom 4 与 tinyxml2 10 ABI，避免安装成功后导入失败。
 
 ## 手工同步
 
@@ -46,16 +47,14 @@ uv run agilex-data-collection setup
 ```bash
 git submodule sync --recursive
 git submodule update --init
-pyenv install -s "$(pyenv latest -k 3.11)"
 pyenv install -s "$(pyenv latest -k 3.12)"
-python311="$(PYENV_VERSION="$(pyenv latest -k 3.11)" pyenv which python)"
 python312="$(PYENV_VERSION="$(pyenv latest -k 3.12)" pyenv which python)"
 
-UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-sdk-python --frozen --python "$python311"
-UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-gello-software --frozen --python "$python311"
+UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-sdk-python --frozen --python "$python312"
+UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-gello-software --frozen --python "$python312"
 UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/lerobot-converter --frozen --extra dataset --python "$python312"
-UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/camera-submodule-d455f --frozen --python "$python311"
-UV_NO_MANAGED_PYTHON=1 uv sync --frozen --python "$python311"
+UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/camera-submodule-d455f --frozen --python "$python312"
+UV_NO_MANAGED_PYTHON=1 uv sync --frozen --python "$python312"
 UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-adapters --extra app --python "$python312"
 mkdir -p data/raw data/lerobot
 ```
@@ -65,7 +64,7 @@ mkdir -p data/raw data/lerobot
 
 GELLO 和 camera-realsense 包通过根目录 `tool.uv.sources` 中的本地 editable 路径安装。controller 与 GELLO 独立 CLI 各自安装相同代码的基础依赖，这是两个独立环境；无需将多个虚拟环境加入 PYTHONPATH。
 
-GELLO 当前使用 `agilex_gello_software` 导入命名空间和锁定的 PyPI DynamixelSDK 4.0.5。开发期间使用 `--skip-submodules` 保留本地改动。初始化应使用主项目固定的子模块提交；需要主动升级时才运行 `git submodule update --init --remote`（按 `.gitmodules` 的 `branch = main`），并在测试通过后提交新的引用。
+GELLO 当前使用 `agilex_gello_software` 导入命名空间和锁定的 PyPI DynamixelSDK 4.0.5。开发期间使用 `--skip-submodules` 保留本地改动。初始化应使用主项目固定的子模块提交；需要主动升级时才运行 `git submodule update --init --remote`（按 `.gitmodules` 的 `branch = dev`（`main` 基线仍跟踪 `main`）），并在测试通过后提交新的引用。
 
 更新已有工作副本前，将原子模块目录中的 `.venv` 移到仓库外备份。
 迁移后的入口脚本必须由新环境生成，再按以下顺序更新：
@@ -98,7 +97,7 @@ uv run --frozen pytest
 ```
 
 浏览器数采自身的环境用 `uv run agilex-data-collection setup` 安装；`--help` 只验证
-3.11 入口，不读取 3.12 环境。
+根入口，不加载独立网页环境。
 
 脚本会检查 CLI、FFmpeg 与 converter 的 TorchCodec 加载。真实转换回归可通过 `uv run --frozen pytest -m integration` 单独运行。
 
@@ -127,3 +126,17 @@ uv run --project third-party/camera-submodule-d455f camera-realsense info --prof
 ```
 
 根据实际 profile 设置 controller 的 `[camera]`，不要用相机库独立实验的 TOML 代替 controller 配置。首次联调按 README 先做只读检查，再启动跟随和短集采集；检查质量报告后再长时间采集。无图形桌面保持 `preview=false`。
+
+## Python 3.12 验证记录（2026-11-05）
+
+目录迁移已先发布到 `main`（`a8ab196`），Python 迁移只在其后的 `dev` 中进行。
+根项目与五个子模块均使用 Python 3.12.16。软件回归共 276 项：controller 122、
+GELLO 12、SDK 59、camera 59、converter 12、adapters/application 12。
+包含真实 LeRobot 数值/RGB-D 数据集回读、模拟帧和本地 IPC；未进行真机实验。
+SDK/camera Pyright、现有 lint、六个分发包构建及仓库外 wheel 导入均通过。
+
+GELLO `full` 依赖完成安装与关键模块导入检查，包括 DynamixelSDK、RealSense、
+MuJoCo、Pinocchio、pygame 和 Qt。发现并修正了 pin 3.7 与新版 urdfdom/tinyxml2
+的 ABI 不匹配；不以安装成功代替二进制导入检查。xarm 上游存在转义字符串的
+SyntaxWarning，不阻止导入。未运行图形仿真、Menagerie 模型或 ROS 2 构建；
+本机未安装 pyenv，未执行一键脚本的 pyenv 安装分支，使用现有完整解释器验证。

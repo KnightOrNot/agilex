@@ -7,7 +7,7 @@
 新应用环境安装、模拟验证及接口边界见[README](README.md)与
 [架构与数据流](docs/index.md)。
 
-controller 使用 Python 3.11 和 uv，依赖由 `pyproject.toml` 与 `uv.lock` 管理。GELLO 与 camera-realsense 通过本地 editable 依赖安装；不要在 controller 环境中安装 SDK 硬件依赖、LeRobot 或 PyTorch。
+controller 使用 Python 3.12 和 uv，依赖由 `pyproject.toml` 与 `uv.lock` 管理。GELLO 与 camera-realsense 通过本地 editable 依赖安装；不要在 controller 环境中安装 SDK 硬件依赖、LeRobot 或 PyTorch。
 
 ```bash
 ./scripts/setup.sh --skip-system --skip-submodules
@@ -15,7 +15,7 @@ uv sync --frozen
 uv run agilex-controller --help
 ```
 
-SDK、GELLO 与 camera-realsense 的独立环境使用 Python 3.11，converter 使用 Python 3.12。各子项目的环境用于其独立工具和开发；一个子项目的 `.venv` 不会自动成为另一个解释器的导入路径。
+SDK、GELLO 与 camera-realsense 的独立环境使用 Python 3.12，converter 使用 Python 3.12。各子项目的环境用于其独立工具和开发；一个子项目的 `.venv` 不会自动成为另一个解释器的导入路径。
 
 ## 模块分工
 

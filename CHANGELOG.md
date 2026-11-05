@@ -4,6 +4,15 @@
 
 ## 0.1.0（未发布，2026-10-29）
 
+### Python 3.12 开发分支（2026-11-05）
+
+- 在已发布的目录迁移 main 基线上统一 controller、GELLO、SDK 和 camera 的
+  Python 3.12 环境，更新锁文件、类型检查、CI 与安装说明；converter 和
+  adapters 继续使用原有 Python 3.12 独立环境。
+- 修复 GELLO simulation/full 中 pin 3.7 与 urdfdom/tinyxml2 主版本不兼容导致的
+  二进制导入失败；Python CI 覆盖 dev。
+- dev 上显式子模块远程升级跟踪各自 dev，普通更新继续使用固定 gitlink。
+
 ### 子模块目录迁移（2026-11-05）
 
 - 五个子模块移至 `third-party/`；相机目录改为 `camera-submodule-d455f`，

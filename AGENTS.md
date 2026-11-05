@@ -1,5 +1,28 @@
 # Repository Guidelines
 
+## Submodule layout and branch policy (2026-11-05)
+
+All five first-party submodules live under `third-party/`: `agilex-sdk-python`,
+`agilex-gello-software`, `lerobot-converter`, `agilex-adapters`, and
+`camera-submodule-d455f`. The camera remote is
+`git@github.com:KnightOrNot/camera-realsense-d455f.git`; its Python distribution,
+CLI and import namespace remain `camera-realsense` / `camera_realsense`.
+These paths supersede root-level submodule paths in older checkpoints below.
+
+Directory migration and camera renaming are published on `main` first. Create
+`dev` from that published baseline for subsequent development, including Python
+3.12 migration; do not mix the Python migration into the structural main commit.
+On `dev`, controller, GELLO, SDK and camera select Python 3.12, matching converter
+and adapters. Root/GELLO require `>=3.12,<3.13`; use each project's frozen lock.
+The `dev` .gitmodules tracks child `dev` for explicit remote upgrades.
+This branch policy supersedes older branch instructions below. Test without
+physical CAN, serial, camera access or motion unless the operator authorizes it.
+
+Use `git submodule sync --recursive` then `git submodule update --init` for pinned
+updates. Use `--remote` only for an explicit upgrade, respecting `.gitmodules`
+branch settings. Publish tested child commits before parent gitlinks. Re-sync
+virtual environments after moving directories. Read `docs/installation.md`.
+
 ## Current Remote Main Baseline (2026-10-29)
 
 The user authorized migrating all five submodules to their available remote main

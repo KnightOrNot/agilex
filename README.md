@@ -5,8 +5,8 @@ PiPER-X 与 GELLO 的遥操作和数据采集项目。仓库提供两个并列�
 
 | 入口 | 运行形态 | 输出 |
 | --- | --- | --- |
-| `agilex-controller`（Python 3.11） | 终端命令与 Shell 脚本：跟随、录制、JS 定位、离线转换 | raw JSONL + 图像，再由 converter 生成 LeRobot Dataset v3 |
-| `agilex-data-collection`（3.11 入口 → 3.12 应用） | 浏览器面板：跟随、采样、保存/丢弃、实时预览、LeLab 数据集管理 | 直接写入 LeRobot Dataset v3，同时保留 raw 审计数据 |
+| `agilex-controller`（Python 3.12） | 终端命令与 Shell 脚本：跟随、录制、JS 定位、离线转换 | raw JSONL + 图像，再由 converter 生成 LeRobot Dataset v3 |
+| `agilex-data-collection`（Python 3.12） | 浏览器面板：跟随、采样、保存/丢弃、实时预览、LeLab 数据集管理 | 直接写入 LeRobot Dataset v3，同时保留 raw 审计数据 |
 
 前者适合脚本化、低开销的跟随和原始数据采集；后者适合按键操作、实时查看
 RGB-D 预览并直接在网页中浏览、合并、上传或删除 LeRobot 数据集。
@@ -16,12 +16,12 @@ RGB-D 预览并直接在网页中浏览、合并、上传或删除 LeRobot 数�
 
 | 组件 | 职责 |
 | --- | --- |
-| controller，Python 3.11 | 应用配置、客户端组合、进程生命周期、跟随和 raw 录制 |
+| controller，Python 3.12 | 应用配置、客户端组合、进程生命周期、跟随和 raw 录制 |
 | `src/agilex_data_collection/`，Python 3.12 | 浏览器数采、硬件 worker、预览、LeLab 集成 |
 | `third-party/agilex-adapters/`，Python 3.12 | LeRobot Robot/Teleoperator 协议适配与私有 IPC 客户端 |
-| `third-party/agilex-gello-software/`，Python 3.11 | GELLO/Dynamixel 读取、设备校准、上游通用实验工具 |
-| `third-party/agilex-sdk-python/`，Python 3.11 | CAN 硬件、运动控制、反馈、ZMQ 服务 |
-| `third-party/camera-submodule-d455f/`，Python 3.11 | RGB-D 采集、设备时间戳、深度单位与标定 |
+| `third-party/agilex-gello-software/`，Python 3.12 | GELLO/Dynamixel 读取、设备校准、上游通用实验工具 |
+| `third-party/agilex-sdk-python/`，Python 3.12 | CAN 硬件、运动控制、反馈、ZMQ 服务 |
+| `third-party/camera-submodule-d455f/`，Python 3.12 | RGB-D 采集、设备时间戳、深度单位与标定 |
 | `third-party/lerobot-converter/`，Python 3.12 | raw 校验、时间戳重采样、LeRobot 数据集与质量报告 |
 
 ```text
@@ -76,7 +76,7 @@ uv run agilex-data-collection setup
 它安装 LeRobot（官方 v0.6.0）与固定提交的 LeLab，并构建网页。默认选择
 Python 3.12.14，以避免系统解释器缺少 `Python.h` 导致 evdev 构建失败；
 已有完整解释器时可用 `setup --python /path/to/python3.12`。原 controller 的
-Python 3.11 环境不会安装这些依赖。
+Python 3.12 环境不会安装这些依赖。
 
 加入 `dialout` 后需要注销并重新登录。完整依赖与手工安装流程见
 [安装指南](docs/installation.md)。
@@ -203,7 +203,7 @@ uv run agilex-data-collection serve --simulate
 
 预览通过 `/api/preview/ws?mode=rgb|depth|rgbd|cloud` 按 `dataset_fps` 推送，
 只在有新帧时发送并丢弃过期帧；编码与点云计算在 3.12 网页进程执行，不进入
-3.11 控制/写盘线程，也不会阻塞控制与录制。同一服务最多两个同源连接。
+3.12 控制/写盘线程，也不会阻塞控制与录制。同一服务最多两个同源连接。
 
 点云由深度图按**标定内参**反投影为深度相机坐标系下的 XYZ（米），按距离着色，
 不推测 RGB 纹理或 RGB/深度外参；仅接受无畸变的 rectified 深度标定。
@@ -265,7 +265,7 @@ RGB 输出为视频；深度为以米计的 float32 图像特征，原始 Z16 �
 
 ### 进程边界
 
-Python 3.12 适配器通过 owner-private Unix IPC 连接 3.11 硬件进程；该进程复用
+Python 3.12 适配器通过 owner-private Unix IPC 连接 3.12 硬件进程；该进程复用
 现有低层初始化、GELLO 校准、SDK 客户端和清理函数，不调用旧 `run_workflow`。
 两条真机链路共享原有互斥锁。控制停止发送命令后硬件看门狗触发清理；正常退出
 先清理硬件，再完成数据集刷新。

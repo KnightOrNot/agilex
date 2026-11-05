@@ -1,4 +1,4 @@
-"""Startup and cleanup diagnostics shared by the 3.11 and 3.12 processes."""
+"""Startup and cleanup diagnostics shared by the worker and web processes."""
 
 from __future__ import annotations
 

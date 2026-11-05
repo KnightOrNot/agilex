@@ -1,4 +1,4 @@
-"""Python 3.11 hardware boundary. Importing this module never opens devices.
+"""Python 3.12 hardware boundary. Importing this module never opens devices.
 
 Reuse existing, tested low-level composition helpers without changing the legacy
 workflow. This worker exposes only owner-private IPC, never a TCP pickle service.

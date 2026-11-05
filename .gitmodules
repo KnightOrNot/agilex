@@ -1,20 +1,20 @@
 [submodule "agilex-sdk-python"]
 	path = third-party/agilex-sdk-python
-	branch = main
+	branch = dev
 	url = git@github.com:KnightOrNot/agilex-sdk-python.git
 [submodule "agilex-gello-software"]
 	path = third-party/agilex-gello-software
-	branch = main
+	branch = dev
 	url = git@github.com:KnightOrNot/agilex-gello-software.git
 [submodule "lerobot-converter"]
 	path = third-party/lerobot-converter
-	branch = main
+	branch = dev
 	url = git@github.com:KnightOrNot/lerobot-converter.git
 [submodule "camera-realsense"]
 	path = third-party/camera-submodule-d455f
-	branch = main
+	branch = dev
 	url = git@github.com:KnightOrNot/camera-realsense-d455f.git
 [submodule "agilex-adapters"]
 	path = third-party/agilex-adapters
-	branch = main
+	branch = dev
 	url = git@github.com:KnightOrNot/agilex-adapters.git

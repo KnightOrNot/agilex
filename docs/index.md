@@ -18,7 +18,7 @@ flowchart LR
     R --> L[converter：校验和时间对齐]
     L --> D[data/lerobot：Dataset v3]
 
-    W[agilex-data-collection：3.12 网页] -->|Unix IPC| H[硬件 worker：3.11]
+    W[agilex-data-collection：3.12 网页] -->|Unix IPC| H[硬件 worker：3.12]
     H --> G
     H --> A
     H --> S
@@ -29,11 +29,11 @@ flowchart LR
 
 | 运行单元 | 环境 | 数据/设备所有权 |
 | --- | --- | --- |
-| controller + GELLO 基础包 + camera | 根目录 `.venv`，3.11 | GELLO 串口、相机、机器人客户端、应用状态、raw |
-| SDK server | SDK 自己的 `.venv`，3.11 | CAN、机械臂反馈与命令 |
+| controller + GELLO 基础包 + camera | 根目录 `.venv`，3.12 | GELLO 串口、相机、机器人客户端、应用状态、raw |
+| SDK server | SDK 自己的 `.venv`，3.12 | CAN、机械臂反馈与命令 |
 | converter | converter 自己的 `.venv`，3.12 | 只读 raw，写新 LeRobot 数据集 |
 | agilex-data-collection 网页 | `third-party/agilex-adapters/.venv`，3.12 | 浏览器 UI、预览编码、LeLab 集成 |
-| 硬件 worker + 适配器 | 根环境与 adapters 环境，3.11/3.12 | 复用 controller 的设备初始化与清理 |
+| 硬件 worker + 适配器 | 根环境与 adapters 环境，3.12 | 复用 controller 的设备初始化与清理 |
 
 controller 的 `RobotClient` 是现有 SDK wire protocol 的应用侧适配器。本次未修改 SDK；协议仍为 ZMQ REQ/REP 和 pickle 的 `method/args` 请求。服务默认监听本机，部署时保持在可信网络范围内。
 
@@ -61,7 +61,7 @@ SDK 子进程不会随终端 Ctrl+C 先于回零退出。初始化中的停止�
 也不调用旧 `run_workflow`：
 
 1. `serve` 在启动网页进程前，按 `[robot]` 调用 SDK 的 CAN 配置脚本；模拟模式跳过。
-2. 网页进程校验运动确认和任务描述，通过后拉起 3.11 硬件 worker。
+2. 网页进程校验运动确认和任务描述，通过后拉起 3.12 硬件 worker。
 3. worker 获取共享互斥锁，复用 controller 的设备预检、GELLO 校准、SDK 服务和清理函数，
    完成相机预热、JS 回零与 GELLO 对齐。
 4. 适配器通过 owner-private Unix IPC 收发动作；网页按 `dataset_fps` 发布预览，
