@@ -23,6 +23,145 @@ updates. Use `--remote` only for an explicit upgrade, respecting `.gitmodules`
 branch settings. Publish tested child commits before parent gitlinks. Re-sync
 virtual environments after moving directories. Read `docs/installation.md`.
 
+## gstack（必需）
+
+本项目要求使用全局安装的 gstack。开始任何工作前先验证：
+
+```bash
+_GS=""
+for _D in "${GSTACK_ROOT:-}" "$HOME/.claude/skills/gstack" "$HOME/.codex/skills/gstack" "$HOME/.factory/skills/gstack" "$HOME/.kiro/skills/gstack" "$HOME/.config/opencode/skills/gstack" "$HOME/.slate/skills/gstack" "$HOME/.cursor/skills/gstack" "$HOME/.openclaw/skills/gstack" "$HOME/.hermes/skills/gstack" "$HOME/.gbrain/skills/gstack" "$HOME/.copilot/skills/gstack" "$HOME/.gemini/antigravity-cli/skills/gstack" "$HOME/.gemini/skills/gstack" "$HOME/.gstack/repos/gstack"; do
+  [ -z "$_GS" ] && [ -n "$_D" ] && [ -d "$_D/bin" ] && _GS="$_D"
+done
+[ -n "$_GS" ] && echo "GSTACK_OK: $_GS" || echo "GSTACK_MISSING"
+```
+
+若输出 `GSTACK_MISSING`，停止并告知用户：
+
+> gstack 是本仓库 AI 辅助工作的必需工具。安装：
+> ```bash
+> git clone --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack
+> cd ~/.claude/skills/gstack && ./setup --team
+> ```
+> 然后重启 AI 工具。
+
+不要跳过技能、忽略 gstack 错误或绕过缺失的 gstack。
+
+使用 gstack 技能：安装后可用 `/qa`、`/ship`、`/review`、`/investigate`、`/browse`。
+所有网页浏览使用 `/browse`（优先 Aside，回退到 gstack 自带浏览器）。gstack 文件路径
+使用上面解析出的安装目录，默认 `~/.claude/skills/gstack`。
+
+`.claude/settings.json` 中的 Skill gate 通过 Node.js 运行
+`.claude/hooks/check-gstack.cjs`，无法运行时会被阻止。若提示 `node: not found`，
+让用户安装 Node.js；若提示 `Cannot find module ... check-gstack.cjs`，说明钩子文件
+缺失。不要绕过这两种阻止。
+
+本仓库统一使用 `AGENTS.md` 作为项目指令文件。Claude Code 默认在项目没有
+`CLAUDE.md` 时加载 `AGENTS.md`；不要重新生成 `CLAUDE.md`。若确需为旧版客户端桥接，
+创建只含 `@AGENTS.md` 的 `CLAUDE.md`，但优先保持只有 `AGENTS.md`。
+
+## 末端力估计与精密装配工作流（2026-11-05）
+
+用户指定 `~/lab/demo/` 作为下一阶段工作依据：`精密装配-演示方案.pdf`、`README.md`
+和 `CLAUDE.md`。目标是让 AgileX PiPER-X 在不额外安装末端力/力矩传感器的前提下估计
+末端受力，并把力/接触信息接入插销等精密装配策略。以下为摘要；demo README 更详细，
+PDF 是范围与决策的原始依据。
+
+### 目标与路线优先级
+
+装配流水线：任务指令 → 阶段规划器 → VLA（抓取、接近、粗对准）→ 接触建立与阶段
+切换 → 接触策略（搜索、调整、插入）→ 完成验证 → 释放。失败时退让或重新抓取。
+接触调整和异常中断在本机执行，不得阻塞等待高层模型响应。
+
+按新增硬件成本排序的三条路线：
+
+1. **电机电流 → 关节力矩 → 动力学残差 → 末端 wrench**（首选，只需驱动器可读
+   电流）。代表工作 TA-VLA，在 LeRobot 数据中增加 `observation.effort`。
+2. **本体感觉局部接触策略**，不显式估计力（读不到电流时的兜底）。代表工作
+   Blind Precise Assembly，只用 q、q̇、末端位姿/速度和上一动作；真机零样本插销
+   成功率 73%。
+3. **腕部 6D F/T 或机械臂内置腕力估计**（精度最高，建议作为真值校验而非第一步）。
+   代表工作 ForceVLA / ForceVLA2；ForceVLA2 的代码和数据尚未发布。
+
+关键判断：插销任务不一定需要连续、精确的力数值。显式力矩路线和 blind 路线可以
+并行验证。
+
+### 本仓库相关的硬件事实
+
+- PiPER-X 是 6 自由度。SDK 的 `get_motor_diagnostics()` 已逐轴返回
+  `motor_current_a`、`motor_torque_nm`、驱动器电压/温度、FOC 状态和反馈频率；
+  `PiperXState` 目前只含关节位置、法兰位姿、使能/错误状态和反馈时间，不含电流或
+  力矩。该诊断方法是逐轴轮询，不是高频流。
+- Phase 0 仍需实测确认：电流/力矩的单位与符号、电机侧还是关节侧、反馈频率、
+  `k_t`、温漂，以及控制接口是否支持力矩、阻抗或力位混合。当前基线只有位置控制。
+- GELLO 是主端，Dynamixel 的电流/负载是主端信号，不能当作从端 PiPER-X 的末端力。
+- 硬件访问保持在 SDK；控制器和采集应用只消费 SDK 输出，不直接打开 CAN。
+
+### 数据采集
+
+统一记录并对齐时间戳：`timestamp`（单调时钟）、`q`、`q̇`、`i` 或 `τ_meas`、
+`τ_cmd`、`tcp_pose`、`gripper_width`、`action`、`images`（前视/腕部可选）、
+`success`。策略数据 50–100 Hz；底层电流/力矩 1 kHz，用于参数辨识。LeRobot 数据
+把力矩放入 `observation.effort`（单臂 6 维，双臂 14 维），与 `observation.state`
+并列；力矩归一化统计必须与 state 分开。
+
+### 估计器实现顺序
+
+1. `τ_joint,i ≈ k_t,i · i_i · N_i · η_i`，先加低通滤波，观察插销过程中的力矩
+   曲线。
+2. 加入空载、夹爪和零件重力项 `g(q)`，以及库仑加粘滞摩擦
+   `τ_f = f_c·sign(q̇) + b·q̇`，得到
+   `τ_ext = τ_meas − [M(q)q̈ + C(q,q̇)q̇ + g(q) + τ_f]`。
+3. 不要直接对编码器位置做二阶差分；使用广义动量观测器，稳态 `r ≈ τ_ext`。
+   接触检测带宽 10–50 Hz，力控闭环一般不超过 20–30 Hz。
+4. 映射到 TCP：`τ_ext = Jᵀ(q)·F_ext`。6 自由度非奇异时 J 为 6×6，可直接求逆；
+   接近奇异用阻尼最小二乘 `(J·Jᵀ + λI)⁻¹·J·τ_ext`。J 必须按工具长度、夹爪和
+   零件抓取位置标定；零件质量要作为独立负载辨识，不能并进 `g(q)`，否则接触力
+   会被低估。
+5. 噪声过大时降低带宽，或改用学习式回归和接触状态分类（TCN、MLP 或小型
+   Transformer；标签来自临时 F/T、仿真真值或已知质量悬挂）。
+
+标定顺序：空载重力补偿 → 加夹爪重新辨识 → 加典型零件辨识负载 → 用已知质量悬挂
+检查幅值和方向 → 有条件时借 F/T 传感器做对比，拟合系统偏差。
+
+### 仿真、策略集成与评测
+
+- 仿真基准用 AssembleBench（圆/方销、齿轮、螺母；默认不向策略暴露力观测），
+  资产用 mjfit（多形状插销、齿轮、螺纹）。Isaac Lab 可用
+  `get_link_incoming_joint_force()` 读取力真值；MuJoCo 接触力和关节力矩可做标签。
+  域随机化覆盖零件尺寸/形状、间隙、摩擦、质量、抓取与夹具位姿、接触参数。
+- 策略集成三选一：A) TA-VLA 式，把估计关节力矩作为 effort token 注入 π0，历史
+  10 帧，辅以未来力矩预测；B) Blind 式，接触阶段只用 q/q̇/动作历史；C)
+  ForceVLA/ForceVLA2 式，有 6D F/T 且控制器支持力位混合时使用。
+- 控制层：有力矩/阻抗接口时用阻抗或力位混合；只有位置接口时用导纳
+  `q_cmd = q_meas + K⁻¹·(F_des − F_ext)`。估计力进入闭环前必须低通、限幅和加
+  死区；始终保留力/力矩上限、看门狗和急停。
+- 评测同时记录：成功率（按形状、尺寸、间隙）、插入时间或搜索路径长度、峰值接触
+  力和超调、与 F/T 或仿真真值的估计误差、未见零件泛化、sim2real 差距。
+
+### 风险与边界
+
+电流估力矩受摩擦、重力、负载、温漂和电流环噪声影响；二阶差分 q̈ 会让噪声淹没
+接触信号；J、工具长度和抓取位置误差会放大；6 自由度本臂没有冗余零空间问题，但
+奇异位形仍需阻尼最小二乘；连续力大不等于装配成功（卡住时力大但方向可能错），
+需要搜索策略或接触状态分类；学习式估计依赖标签，存在 sim2real gap；估计力有延迟
+和偏差，力控闭环必须限幅、看门狗和急停。
+
+### 待确认与仓库侧下一步
+
+Phase 0 硬件审计：控制接口（位置/速度/力矩/阻抗）、电流/力矩读取频率与单位、
+`k_t`、夹爪型号与开度反馈、相机布局、GPU、安全限制（关节速度/力矩上限、急停）。
+仓库侧优先做：
+
+- 在 SDK 增加带时间戳的高频电机电流/力矩流式读取，不逐帧轮询诊断接口；保留现有
+  只读接口和 CLI 兼容性。
+- 在控制器新增估计器模块（重力/摩擦辨识、动量观测器、J 映射），先用 fake 或回放
+  数据测试。
+- 在采集和 LeRobot 输出中增加 `observation.effort`（6 维）及标定元数据。
+- 所有力信号默认只读并限幅；物理运动、负载标定和 F/T 对比必须由操作员授权，本
+  工作流不得自动执行。
+
+本摘要来自代码检查和文档阅读，未进行任何硬件读取、标定或运动验证。
+
 ## Current Remote Main Baseline (2026-10-29)
 
 The user authorized migrating all five submodules to their available remote main
