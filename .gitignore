@@ -8,5 +8,16 @@ __pycache__/
 dist/
 *.egg-info/
 
+# Local agent state and credentials
+/.agents/
+/.codex/
+/.aws/
+/.gstack/
+
+# Keep shared Claude configuration and hooks; ignore local overrides and state
+/.claude/*
+!/.claude/settings.json
+!/.claude/hooks/
+
 # data files
 /data/
