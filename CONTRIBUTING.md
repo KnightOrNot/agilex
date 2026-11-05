@@ -2,12 +2,13 @@
 
 ## 开发环境
 
-本轮新数采开发统一使用 `dev`。新链路仅修改 `src/agilex_data_collection/`
+当前主项目及五个子模块统一使用 `main`，已合并的 `dev` 不再保留；需要隔离改动时从
+`main` 创建临时功能分支，合并完成后删除。新链路仅修改 `src/agilex_data_collection/`
 和独立 `agilex-adapters` 子模块，保持原 controller 运行链路不变。
 新应用环境安装、模拟验证及接口边界见[README](README.md)与
 [架构与数据流](docs/index.md)。
 
-controller 使用 Python 3.12 和 uv，依赖由 `pyproject.toml` 与 `uv.lock` 管理。GELLO 与 camera-realsense 通过本地 editable 依赖安装；不要在 controller 环境中安装 SDK 硬件依赖、LeRobot 或 PyTorch。
+所有项目的 Python 3.12 解释器、独立 `.venv` 和依赖统一由 uv 管理；controller 依赖由 `pyproject.toml` 与 `uv.lock` 管理。GELLO 与 camera-realsense 通过本地 editable 依赖安装；不要在 controller 环境中安装 SDK 硬件依赖、LeRobot 或 PyTorch。
 
 ```bash
 ./scripts/setup.sh --skip-system --skip-submodules
@@ -66,16 +67,16 @@ uv run --frozen pytest -m "not integration"
 
 没有全仓覆盖率门槛。为行为变化增加针对性测试，尤其是异常、取消和数据兼容；避免只复述实现的测试。
 
-修改 GELLO 后，在其目录执行 `uv run --frozen pytest`。本地适配仅修改 `src/`，原生 `gello/`、脚本和配置由哈希清单约束，检查方式为：
+修改 GELLO 后，在其目录执行 `uv run --frozen pytest`，并运行现有 CI 的 lint：
 
 ```bash
-uv run --frozen ruff check src tests
-uv run --frozen ruff format --check src tests
-uv run --frozen ruff check gello experiments scripts --select E9,F63,F7,F82
-uv run --frozen python -m agilex_gello_software.upstream
+uv run --frozen ruff check src tests experiments scripts --select E9,F63,F7,F82
 ```
 
-不要格式化原始上游文件；必要行为适配写入本地 src。GELLO 与 controller 环境都通过 uv 安装固定的 `third_party/DynamixelSDK/python`；依赖变化同步更新两份 uv.lock。SDK 服务项目本次保持原样；如后续单独修改，使用其 README 中的检查流程。
+不要格式化无关上游文件；必要行为适配写入本地 `src/`。当前 GELLO 使用
+`agilex_gello_software` 命名空间和 PyPI `dynamixel-sdk==4.0.5`，没有嵌套 SDK、
+`gello/` 导入或离线上游审计命令。共享依赖变化同步更新 GELLO 与 controller 的
+`uv.lock`；SDK 单独修改时，使用其 README 中的检查流程。
 
 ## Submodule 与多仓库工作流
 

@@ -43,7 +43,7 @@ def main(argv: list[str] | None = None) -> int:
     setup = commands.add_parser(
         "setup", help="install the separate Python 3.12 app environment"
     )
-    setup.add_argument("--python", default="3.12.14", help="runtime interpreter")
+    setup.add_argument("--python", default="3.12", help="runtime interpreter")
     serve = commands.add_parser("serve", help="start the collection web app")
     serve.add_argument("--simulate", action="store_true", help="never open hardware")
     serve.add_argument("--port", type=int, default=8000)

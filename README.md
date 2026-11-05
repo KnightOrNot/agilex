@@ -1,5 +1,7 @@
 # agilex-controller
 
+所有开发与运行环境统一由 uv 管理：按 `.python-version` 选择 Python，使用本项目 `.venv`，依赖按 `uv.lock` 同步。
+
 PiPER-X 与 GELLO 的遥操作和数据采集项目。仓库提供两个并列、都常用的入口，
 共用同一套设备配置、硬件互斥锁和底层客户端：
 
@@ -51,7 +53,7 @@ data/lerobot/app/              浏览器数采直接写入的数据集
 
 子模块更新使用 `git submodule sync --recursive` 后再
 `git submodule update --init`；只有显式升级才加 `--remote`。
-迁移与环境重建步骤见[安装指南](docs/installation.md)。后续开发使用 `dev`。
+迁移与环境重建步骤见[安装指南](docs/installation.md)。Python 3.12 与 uv 迁移已合并到 `main`，后续以 `main` 为基线开发。
 
 在 Linux 上 clone 项目，然后运行：
 
@@ -59,7 +61,7 @@ data/lerobot/app/              浏览器数采直接写入的数据集
 ./scripts/setup.sh
 ```
 
-脚本初始化 submodule、准备 pyenv 和 uv、安装系统依赖并同步各环境。
+脚本初始化 submodule、由 uv 安装 Python、创建各项目的 `.venv`，并安装系统依赖。
 开发中保留已有子模块修改时：
 
 ```bash
@@ -74,14 +76,14 @@ uv run agilex-data-collection setup
 ```
 
 它安装 LeRobot（官方 v0.6.0）与固定提交的 LeLab，并构建网页。默认选择
-Python 3.12.14，以避免系统解释器缺少 `Python.h` 导致 evdev 构建失败；
+由 uv 管理的 Python 3.12，提供构建 evdev 所需的 `Python.h`；
 已有完整解释器时可用 `setup --python /path/to/python3.12`。原 controller 的
 Python 3.12 环境不会安装这些依赖。
 
 加入 `dialout` 后需要注销并重新登录。完整依赖与手工安装流程见
 [安装指南](docs/installation.md)。
 
-## 配置与只读检查
+## 配置与设备检查
 
 两个入口都读取 [config/default.toml](config/default.toml)：
 
@@ -91,7 +93,7 @@ Python 3.12 环境不会安装这些依赖。
 - `[collection]` 只属于浏览器数采，controller 会忽略该表。
 
 设备 ID、弧度 offset、设备方向和夹爪端点必须与当前 GELLO 标定一致；
-`follower_signs` 是额外的主手到从臂方向映射。修改后先用只读命令核对：
+`follower_signs` 是额外的主手到从臂方向映射。修改后先核对配置和设备：
 
 ```bash
 uv run agilex-controller config
@@ -100,7 +102,8 @@ uv run agilex-controller status
 uv run --project third-party/camera-submodule-d455f camera-realsense info --profiles
 ```
 
-`read` 只打开主手串口；`status` 调用 SDK 的只读检查，要求 CAN 已配置。
+`read` 会在 GELLO 驱动初始化时关闭主手扭矩，不是严格只读；需要保持电机状态的
+审计不要调用它，应只发送 Dynamixel PING/READ。`status` 调用 SDK 的只读检查，要求 CAN 已配置。
 手工配置默认 CAN：
 
 ```bash

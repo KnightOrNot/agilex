@@ -14,7 +14,7 @@ usage() {
     cat <<'EOF'
 用法：./scripts/setup.sh [选项]
 
-初始化 agilex-controller 的 submodule、pyenv Python、controller 与四个子项目的 uv 环境和系统依赖。
+初始化 agilex-controller 的 submodule、uv 管理的 Python、controller 与四个子项目的 uv 环境和系统依赖。
 脚本不会配置 CAN、访问串口或向机械臂发送命令，可安全重复执行。
 
 选项：
@@ -82,49 +82,22 @@ cd "$root_dir"
 [[ -f .gitmodules ]] || fail "找不到 agilex-controller 仓库根目录"
 
 if [[ "$install_system" == true ]]; then
-    log "[1/7] 安装 Ubuntu 系统依赖"
+    log "[1/6] 安装 Ubuntu 系统依赖"
     command -v sudo >/dev/null 2>&1 || fail "找不到 sudo；可用 --skip-system 跳过"
     command -v apt-get >/dev/null 2>&1 \
         || fail "默认系统安装仅支持 apt-get；请手工安装依赖后使用 --skip-system"
     sudo apt-get update
     sudo apt-get install -y \
-        build-essential curl ffmpeg git iproute2 libbz2-dev libffi-dev \
-        liblzma-dev libncursesw5-dev libreadline-dev libsqlite3-dev \
-        libssl-dev libusb-1.0-0 libxml2-dev libxmlsec1-dev lsof make tk-dev xz-utils \
-        zlib1g-dev
+        build-essential curl ffmpeg git iproute2 libusb-1.0-0 lsof
 else
-    log "[1/7] 检查基础命令"
+    log "[1/6] 检查基础命令"
     for command_name in git curl; do
         command -v "$command_name" >/dev/null 2>&1 \
             || fail "找不到 $command_name；请安装系统依赖或取消 --skip-system"
     done
 fi
 
-log "[2/7] 准备 pyenv"
-export PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"
-export PATH="$PYENV_ROOT/bin:$PATH"
-if ! command -v pyenv >/dev/null 2>&1; then
-    if [[ "$check_only" == true ]]; then
-        fail "未安装 pyenv"
-    fi
-    [[ ! -e "$PYENV_ROOT" ]] \
-        || fail "$PYENV_ROOT 已存在但 pyenv 不可用，请先检查现有安装"
-    git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT"
-fi
-
-if [[ "$check_only" != true ]] && [[ -f "$HOME/.bashrc" ]] \
-    && ! grep -Fq '# agilex-controller setup: pyenv' "$HOME/.bashrc"; then
-    {
-        echo
-        echo '# agilex-controller setup: pyenv'
-        echo 'export PYENV_ROOT="$HOME/.pyenv"'
-        echo '[[ -d "$PYENV_ROOT/bin" ]] && export PATH="$PYENV_ROOT/bin:$PATH"'
-        echo 'eval "$(pyenv init - bash)"'
-    } >> "$HOME/.bashrc"
-fi
-pyenv --version
-
-log "[3/7] 准备 uv"
+log "[2/6] 准备 uv"
 if ! command -v uv >/dev/null 2>&1; then
     if [[ "$check_only" == true ]]; then
         fail "未安装 uv"
@@ -136,7 +109,7 @@ command -v uv >/dev/null 2>&1 || fail "uv 安装后仍不可用，请重新打�
 uv --version
 
 if [[ "$update_submodules" == true ]]; then
-    log "[4/7] 同步 Git submodule"
+    log "[3/6] 同步 Git submodule"
     while IFS= read -r submodule_path; do
         if [[ -e "$submodule_path/.git" ]] \
             && [[ -n "$(git -C "$submodule_path" status --porcelain)" ]]; then
@@ -156,7 +129,7 @@ if [[ "$update_submodules" == true ]]; then
             --init third_party/mujoco_menagerie
     fi
 else
-    log "[4/7] 检查 Git submodule"
+    log "[3/6] 检查 Git submodule"
 fi
 
 for submodule_path in third-party/agilex-sdk-python third-party/agilex-gello-software third-party/lerobot-converter third-party/camera-submodule-d455f third-party/agilex-adapters; do
@@ -173,33 +146,30 @@ fi
 sync_project() {
     local project_dir="$1"
     shift
-    local requested_version resolved_version interpreter
+    local requested_version actual_version
     requested_version="$(tr -d '[:space:]' < "$project_dir/.python-version")"
     [[ -n "$requested_version" ]] || fail "$project_dir/.python-version 为空"
-    resolved_version="$(pyenv latest -k "$requested_version")"
-
     if [[ "$check_only" != true ]]; then
-        pyenv install -s "$resolved_version"
-    fi
-    pyenv prefix "$resolved_version" >/dev/null 2>&1 \
-        || fail "pyenv 中没有 $resolved_version（$project_dir 需要 $requested_version）"
-    interpreter="$(PYENV_VERSION="$resolved_version" pyenv which python)"
-
-    if [[ "$check_only" != true ]]; then
-        UV_NO_MANAGED_PYTHON=1 uv sync \
+        uv python install "$requested_version"
+        uv sync \
             --project "$project_dir" \
             --frozen \
-            --python "$interpreter" \
+            --managed-python \
+            --python "$requested_version" \
             "$@"
     fi
     [[ -x "$project_dir/.venv/bin/python" ]] \
         || fail "$project_dir/.venv 不存在或不完整"
-    printf '%-20s requested=%-6s resolved=%-8s venv=' \
-        "$project_dir" "$requested_version" "$resolved_version"
+    actual_version="$("$project_dir/.venv/bin/python" -c \
+        'import platform; print(platform.python_version())')"
+    [[ "$actual_version" == "$requested_version" \
+        || "$actual_version" == "$requested_version".* ]] \
+        || fail "$project_dir/.venv 使用 $actual_version，需要 $requested_version"
+    printf '%-20s requested=%-6s venv=' "$project_dir" "$requested_version"
     "$project_dir/.venv/bin/python" --version
 }
 
-log "[5/7] 使用 pyenv Python 同步 uv 环境"
+log "[4/6] 使用 uv 管理 Python 并同步环境"
 sync_project third-party/agilex-sdk-python
 if [[ -n "$gello_extra" ]]; then
     sync_project third-party/agilex-gello-software --extra "$gello_extra"
@@ -210,7 +180,7 @@ sync_project third-party/lerobot-converter --extra dataset
 sync_project third-party/camera-submodule-d455f
 sync_project .
 
-log "[6/7] 创建数据目录并验证软件入口"
+log "[5/6] 创建数据目录并验证软件入口"
 if [[ "$check_only" != true ]]; then
     mkdir -p data/raw data/lerobot
 fi
@@ -228,7 +198,7 @@ ffmpeg -version >/dev/null 2>&1 || fail "FFmpeg 不可用"
 third-party/lerobot-converter/.venv/bin/python -c \
     "from torchcodec.decoders import VideoDecoder; print('TorchCodec 加载正常')"
 
-log "[7/7] 检查 GELLO 串口用户组"
+log "[6/6] 检查 GELLO 串口用户组"
 if id -nG "$USER" | tr ' ' '\n' | grep -Fxq dialout; then
     echo "当前用户已属于 dialout。"
 elif [[ "$install_system" == true && "$check_only" != true ]]; then

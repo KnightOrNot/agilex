@@ -2,19 +2,19 @@
 
 ## 要求
 
-使用支持 SocketCAN 的 Linux、PiPER-X/AGX 夹爪、USB-CAN 与 GELLO Dynamixel 主手。软件工具为 Git、pyenv、uv、iproute2、FFmpeg、编译工具和 lsof。系统包与转换依赖在 converter 环境中验证，不进入实时控制环境。
+使用支持 SocketCAN 的 Linux、PiPER-X/AGX 夹爪、USB-CAN 与 GELLO Dynamixel 主手。软件工具为 Git、uv、iproute2、FFmpeg、编译工具和 lsof。系统包与转换依赖在 converter 环境中验证，不进入实时控制环境。
 
 controller 与五个子模块统一使用 Python 3.12。根目录的 `requires-python` 当前限制为 `>=3.12,<3.13`，与 GELLO 包一致。
 
 ## 一键配置
 
 ```bash
-git clone --branch dev git@github.com:KnightOrNot/agilex-controller.git
+git clone --branch main git@github.com:KnightOrNot/agilex-controller.git
 cd agilex-controller
 ./scripts/setup.sh
 ```
 
-setup 从脚本位置找到仓库，初始化五个一级 submodule，通过 pyenv 选择各自 Python，再用 uv 的锁文件同步环境。当前 GELLO 使用 PyPI DynamixelSDK 4.0.5；脚本也兼容声明了嵌套 SDK 的历史版本。它会安装 Ubuntu 系统包、按需安装 pyenv/uv，并检查 dialout。配置过程不访问 CAN/串口，不发送运动命令。
+setup 从脚本位置找到仓库，初始化五个一级 submodule，由 uv 按各自 `.python-version` 安装 Python，再按锁文件同步独立 `.venv`。当前 GELLO 使用 PyPI DynamixelSDK 4.0.5；脚本也兼容声明了嵌套 SDK 的历史版本。它会安装 Ubuntu 系统包、按需安装 uv，并检查 dialout。配置过程不访问 CAN/串口，不发送运动命令。
 
 浏览器数采使用独立的 Python 3.12 环境，首次使用前安装：
 
@@ -23,7 +23,7 @@ uv run agilex-data-collection setup
 ```
 
 它同步 `third-party/agilex-adapters/.venv`，安装 LeRobot（官方 v0.6.0）、LeLab（固定提交）
-和网页依赖，并构建前端，需要网络和 Node。默认 Python 3.12.14；已有完整解释器
+和网页依赖，并构建前端，需要网络和 Node。默认由 uv 选择 Python 3.12；已有完整解释器
 可用 `setup --python /path/to/python3.12`。根目录的 Python 3.12 环境不会安装
 这些依赖，两个环境互不替换。
 
@@ -42,20 +42,18 @@ uv run agilex-data-collection setup
 
 ## 手工同步
 
-已有 pyenv 与 uv 时：
+安装 uv 后：
 
 ```bash
 git submodule sync --recursive
 git submodule update --init
-pyenv install -s "$(pyenv latest -k 3.12)"
-python312="$(PYENV_VERSION="$(pyenv latest -k 3.12)" pyenv which python)"
-
-UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-sdk-python --frozen --python "$python312"
-UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-gello-software --frozen --python "$python312"
-UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/lerobot-converter --frozen --extra dataset --python "$python312"
-UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/camera-submodule-d455f --frozen --python "$python312"
-UV_NO_MANAGED_PYTHON=1 uv sync --frozen --python "$python312"
-UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-adapters --extra app --python "$python312"
+uv python install 3.12
+uv sync --project third-party/agilex-sdk-python --frozen --managed-python --python 3.12
+uv sync --project third-party/agilex-gello-software --frozen --managed-python --python 3.12
+uv sync --project third-party/lerobot-converter --frozen --extra dataset --managed-python --python 3.12
+uv sync --project third-party/camera-submodule-d455f --frozen --managed-python --python 3.12
+uv sync --frozen --managed-python --python 3.12
+uv sync --project third-party/agilex-adapters --frozen --extra app --managed-python --python 3.12
 mkdir -p data/raw data/lerobot
 ```
 
@@ -64,7 +62,7 @@ mkdir -p data/raw data/lerobot
 
 GELLO 和 camera-realsense 包通过根目录 `tool.uv.sources` 中的本地 editable 路径安装。controller 与 GELLO 独立 CLI 各自安装相同代码的基础依赖，这是两个独立环境；无需将多个虚拟环境加入 PYTHONPATH。
 
-GELLO 当前使用 `agilex_gello_software` 导入命名空间和锁定的 PyPI DynamixelSDK 4.0.5。开发期间使用 `--skip-submodules` 保留本地改动。初始化应使用主项目固定的子模块提交；需要主动升级时才运行 `git submodule update --init --remote`（按 `.gitmodules` 的 `branch = dev`（`main` 基线仍跟踪 `main`）），并在测试通过后提交新的引用。
+GELLO 当前使用 `agilex_gello_software` 导入命名空间和锁定的 PyPI DynamixelSDK 4.0.5。开发期间使用 `--skip-submodules` 保留本地改动。初始化应使用主项目固定的子模块提交；需要主动升级时才运行 `git submodule update --init --remote`（五个 `.gitmodules` 均跟踪 `branch = main`），并在测试通过后提交新的引用。
 
 更新已有工作副本前，将原子模块目录中的 `.venv` 移到仓库外备份。
 迁移后的入口脚本必须由新环境生成，再按以下顺序更新：
@@ -84,7 +82,8 @@ uv run agilex-data-collection setup
 `.venv` 移到仓库外备份，再运行上述 setup 重建；不要修补旧入口脚本。
 有未提交的子模块修改时先保存工作，再执行更新；普通更新检出主项目固定的提交，
 不自动跟随远程分支。GELLO 的可选 Menagerie 资产仍按需初始化。
-后续功能与 Python 版本迁移在 `dev` 分支进行，`main` 保留已验证的稳定基线。
+Python 3.12 与 uv 迁移已合并至 `main`，已合并的 `dev` 分支不再保留。
+后续以 `main` 为基线，需要隔离改动时创建临时功能分支。
 
 ## 安装验证
 
@@ -115,6 +114,9 @@ uv run agilex-controller read --json
 uv run agilex-controller status
 ```
 
+`read` 初始化 GELLO 时会关闭主手扭矩；严格只读审计应仅使用 Dynamixel PING/READ，
+不要调用该命令。它不发送从臂运动指令，但会改变主手原有扭矩状态。
+
 确认状态完整、CAN 收包正常后按 README 启动。安装路径改变时重新创建对应 `.venv`，不要修补旧 console-script shebang。
 
 ## RealSense 首次接入
@@ -139,4 +141,4 @@ GELLO `full` 依赖完成安装与关键模块导入检查，包括 DynamixelSDK
 MuJoCo、Pinocchio、pygame 和 Qt。发现并修正了 pin 3.7 与新版 urdfdom/tinyxml2
 的 ABI 不匹配；不以安装成功代替二进制导入检查。xarm 上游存在转义字符串的
 SyntaxWarning，不阻止导入。未运行图形仿真、Menagerie 模型或 ROS 2 构建；
-本机未安装 pyenv，未执行一键脚本的 pyenv 安装分支，使用现有完整解释器验证。
+该次使用现有完整解释器验证，未执行一键脚本的解释器安装流程。

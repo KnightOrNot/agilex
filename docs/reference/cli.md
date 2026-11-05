@@ -13,7 +13,7 @@ uv run agilex-controller [--project-root PATH] [--config FILE] COMMAND [OPTIONS]
 | 命令 | 行为 |
 | --- | --- |
 | `config` | 输出有效配置 JSON |
-| `read [--gello-port PATH] [--json]` | 使用项目校准读取一次真实 GELLO，随后关闭串口 |
+| `read [--gello-port PATH] [--json]` | 初始化时关闭主手扭矩，再使用项目校准读取真实 GELLO，随后关闭串口 |
 | `status [--can-interface IF] [--sdk-project PATH]` | 调用 SDK 自己的解释器读取机械臂状态 |
 | `follow` | 完整的检查、启动、对齐、跟随与退出流程 |
 | `record` / `follow-record` | 完整跟随流程，加 episode 录制和可选自动转换 |
@@ -21,6 +21,8 @@ uv run agilex-controller [--project-root PATH] [--config FILE] COMMAND [OPTIONS]
 | `convert SESSION OUTPUT` | 在 converter 环境中离线转换 |
 
 `read` 和托管跟随使用相同应用锁，避免主手串口被并发打开；直接定位也使用该锁。
+`read` 不是严格只读：驱动初始化会写入关闭扭矩。要求保留设备状态时，仅使用
+Dynamixel 的 PING/READ 事务检查编码器，不运行该命令。
 
 ## follow / record
 
@@ -93,7 +95,7 @@ controller 不导入 converter，使用其 `.venv/bin/python` 调用原 CLI，�
 浏览器数采是独立的 Python 3.12 入口，与 `agilex-controller` 并列：
 
 ```bash
-uv run agilex-data-collection setup [--python 3.12.14]
+uv run agilex-data-collection setup [--python 3.12]
 uv run agilex-data-collection serve [--simulate] [--port 8000] [--config FILE]
 ```
 
