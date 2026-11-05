@@ -1,5 +1,7 @@
 # 故障排查
 
+[English](../../en/reference/errors.md) | 简体中文
+
 ## RealSense frame counter reset
 
 相机在用户确认后、SDK 启动和 JS 回零之前初始化。当前会输出“相机初始化与预热中”与“相机已就绪”，用来区分阶段；之前的回零计划提示不表示机械臂已开始动作。
@@ -77,7 +79,7 @@ FFmpeg/TorchCodec 问题属于 converter 环境：执行 `ffmpeg -version` 和 `
 | 8000 端口被占用 | 停止旧服务，或 `serve --port 8001` 后打开对应端口 |
 | 初始化失败、状态为 `error` | 查看网页错误和 `data/logs/<session>.log`；清理结束后排除设备权限、占用或 CAN 问题再重试 |
 | 启动时提示另一个 workflow 正在运行 | 应用锁被旧流程持有；正常退出旧流程，不要删除锁文件绕过 |
-| `startup_zero` / `exit_zero`、`JS positioning failed` | 容差为 1.1°；查看 `[position_result]` 的六轴反馈、残差和观测范围，先做只读 `motor-status`，不跳过校验 |
+| `startup_zero` / `exit_zero`、`JS positioning failed` | 浏览器容差为 1.1°（CLI 默认 1.0°）；查看 `[position_result]` 的六轴反馈、残差和观测范围，先做只读 `motor-status`，不跳过校验 |
 | 相机快速模式不稳定 | 把 `[collection].camera_mode` 改为 `"slow"`，停止会话后重启 |
 | 深度或点云预览报错 | 确认 `depth_enabled = true` 且已进入 `following`；点云要求无畸变 rectified 深度标定 |
 | 点云不显示 | 启用浏览器 WebGL，刷新并关闭多余标签页；预览最多两个连接 |
@@ -101,3 +103,14 @@ FFmpeg/TorchCodec 问题属于 converter 环境：执行 `ffmpeg -version` 和 `
 - clock stepped / host clock window：采集期间系统时钟突变或 SDK 时间异常，当前对齐失效；重新开始 session 并检查主机时间服务。
 - camera matching error：converter 在目标时间附近找不到允许范围内的帧。检查对应帧索引和采集完整性；提高 `--max-camera-skew-ms` 会放宽质量要求，不能消除误差。
 - LeRobot 深度读数：显式 `depth_output_unit="m"` 得到米制 Tensor；0 代表无效测距。当前锁定版本默认读回单位是 mm。
+
+## 远程启动
+
+| 现象 | 原因与处理 |
+| --- | --- |
+| exec: uv: not found | 检查普通终端 PATH 中的 uv；激活 .venv 不等于安装 uv |
+| 串口存在但无权限 | 核对目标设备所有权和当前 dialout 组，加入组后刷新登录 |
+| camera preview failed | 查看预览子进程原始异常；普通 SSH 使用 --no-camera-preview |
+| Windows RDP 0x204 | 先检查服务启用、凭据/证书和监听，再核对网络/防火墙；不能只凭客户端错误认定原因 |
+
+清理日志中的 `PiPER-X JS target reached` 只报告该定位目标到达，不代表预览或整个会话验收通过。见[远程运行](../installation.md)。

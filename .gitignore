@@ -9,13 +9,15 @@ __pycache__/
 # Test and lint caches
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
 # Build artifacts
 dist/
 *.egg-info/
 
 # Local AI tooling
-/.agents/
 /.codex/
 /.gstack/
 /.claude/*
@@ -25,6 +27,9 @@ dist/
 
 # Local credentials
 /.aws/
+.env
+.env.*
+!.env.example
 
 # Project data
 /data/

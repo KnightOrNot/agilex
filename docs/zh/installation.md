@@ -1,5 +1,7 @@
 # 安装与环境
 
+[English](../en/installation.md) | 简体中文
+
 ## 要求
 
 使用支持 SocketCAN 的 Linux、PiPER-X/AGX 夹爪、USB-CAN 与 GELLO Dynamixel 主手。软件工具为 Git、uv、iproute2、FFmpeg、编译工具和 lsof。系统包与转换依赖在 converter 环境中验证，不进入实时控制环境。
@@ -121,24 +123,42 @@ uv run agilex-controller status
 
 ## RealSense 首次接入
 
-查看[相机安装指南](../third-party/camera-submodule-d455f/docs/installation.md)配置 Linux udev 权限，重新插拔设备；setup 不会自动安装 udev 规则。推荐 USB 3 数据连接，避免与其他采集程序争用设备。
+查看[相机安装指南](../../third-party/camera-submodule-d455f/docs/installation.md)配置 Linux udev 权限，重新插拔设备；setup 不会自动安装 udev 规则。推荐 USB 3 数据连接，避免与其他采集程序争用设备。
 
 ```bash
 uv run --project third-party/camera-submodule-d455f camera-realsense info --profiles
 ```
 
-根据实际 profile 设置 controller 的 `[camera]`，不要用相机库独立实验的 TOML 代替 controller 配置。首次联调按 README 先做只读检查，再启动跟随和短集采集；检查质量报告后再长时间采集。无图形桌面保持 `preview=false`。
+根据实际 profile 设置 controller 的 `[camera]`，不要用相机库独立实验的 TOML 代替 controller 配置。首次联调按 README 先做只读检查，再启动跟随和短集采集；检查质量报告后再长时间采集。无图形桌面运行包装脚本时加 `--no-camera-preview`，因为脚本参数优先于 TOML。
 
-## Python 3.12 验证记录（2026-11-05）
+## 普通终端与远程运行
 
-目录迁移已先发布到 `main`（`a8ab196`），Python 迁移只在其后的 `dev` 中进行。
-根项目与五个子模块均使用 Python 3.12.16。软件回归共 276 项：controller 122、
-GELLO 12、SDK 59、camera 59、converter 12、adapters/application 12。
-包含真实 LeRobot 数值/RGB-D 数据集回读、模拟帧和本地 IPC；未进行真机实验。
-SDK/camera Pyright、现有 lint、六个分发包构建及仓库外 wheel 导入均通过。
+使用全新的普通终端核对 uv，避免只验证部署专用 PATH：
 
-GELLO `full` 依赖完成安装与关键模块导入检查，包括 DynamixelSDK、RealSense、
-MuJoCo、Pinocchio、pygame 和 Qt。发现并修正了 pin 3.7 与新版 urdfdom/tinyxml2
-的 ABI 不匹配；不以安装成功代替二进制导入检查。xarm 上游存在转义字符串的
-SyntaxWarning，不阻止导入。未运行图形仿真、Menagerie 模型或 ROS 2 构建；
-该次使用现有完整解释器验证，未执行一键脚本的解释器安装流程。
+```bash
+command -v uv
+uv --version
+id -nG
+```
+
+若 uv 只装在专用工具目录，将该目录加入 Shell PATH，或安装到标准用户 bin 目录。激活项目虚拟环境本身不会安装 uv。
+
+加入 dialout 后重新连接 SSH，或者启动加载新组权限的 Shell：
+
+```bash
+newgrp dialout
+```
+
+普通 SSH 通常没有图形显示环境。相机包装脚本显式开启 Tk 弹窗，仅设置 TOML preview=false 不能覆盖它：
+
+```bash
+./scripts/start_camera_follow.sh --no-camera-preview
+```
+
+这只关闭本地窗口，不关闭配置的 RGB-D 采集。远程查看浏览器预览时保持 HTTP 回环监听，通过 SSH 转发：
+
+```bash
+ssh -L 8000:127.0.0.1:8000 robot@RON
+```
+
+在 RON 启动采集服务，客户端打开 localhost:8000。真机模式启动服务会准备 CAN，启动真机会话仍需运动确认。也可在配置好的远程图形桌面中打开终端运行 CLI，确保 DISPLAY 可用。远程桌面需要独立配置证书、凭据和网络访问；敏感信息不得放入项目文件。TCP/RDP 握手成功不代表实际桌面登录或相机预览通过。

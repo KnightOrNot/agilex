@@ -1,0 +1,36 @@
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  software:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          # Private children require a token with read access to those repositories.
+          token: ${{ secrets.SUBMODULES_READ_TOKEN || github.token }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.6"
+          python-version: "3.12"
+      - name: Sync the root environment
+        run: make sync
+      - name: Verify documentation, style and hardware-free root behavior
+        run: make verify
+      - name: Describe integration coverage
+        if: always()
+        run: |
+          echo 'Root checks use the same Make targets as local development.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Converter round trips require its separate environment; pytest reports skips when absent.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'This job does not validate all child repositories or physical hardware.' >> "$GITHUB_STEP_SUMMARY"

@@ -1,5 +1,7 @@
 # RGB-D 采集与时间对齐
 
+[English](../en/cameras.md) | 简体中文
+
 ## 运行与边界
 
 `camera-realsense` 负责可复用的设备/profile、逐流 SDK 时间戳、RGB/Z16 帧和标定；controller 组合设备、录制 raw 并管理退出；converter 负责目标时间匹配及 LeRobot 转换。机器人 SDK 与 GELLO 代码未改动。

@@ -1,14 +1,12 @@
-# 贡献指南
+# Contributing
 
-## 开发环境
+English | [简体中文](CONTRIBUTING.zh-CN.md)
 
-当前主项目及五个子模块统一使用 `main`，已合并的 `dev` 不再保留；需要隔离改动时从
-`main` 创建临时功能分支，合并完成后删除。新链路仅修改 `src/agilex_data_collection/`
-和独立 `agilex-adapters` 子模块，保持原 controller 运行链路不变。
-新应用环境安装、模拟验证及接口边界见[README](README.md)与
-[架构与数据流](docs/index.md)。
+## Development environment
 
-所有项目的 Python 3.12 解释器、独立 `.venv` 和依赖统一由 uv 管理；controller 依赖由 `pyproject.toml` 与 `uv.lock` 管理。GELLO 与 camera-realsense 通过本地 editable 依赖安装；不要在 controller 环境中安装 SDK 硬件依赖、LeRobot 或 PyTorch。
+The root and five children use main; merged long-lived dev branches were removed. Use temporary feature branches when isolation is needed. New browser application code belongs in src/agilex_data_collection and the independent adapters child, preserving legacy controller behavior. See [usage](docs/en/usage.md) and [architecture](docs/en/index.md).
+
+uv manages Python 3.12, independent environments and frozen dependencies. GELLO/camera are root editable sources; do not install the SDK hardware stack, LeRobot or PyTorch into the root control environment.
 
 ```bash
 ./scripts/setup.sh --skip-system --skip-submodules
@@ -16,73 +14,65 @@ uv sync --frozen
 uv run agilex-controller --help
 ```
 
-SDK、GELLO 与 camera-realsense 的独立环境使用 Python 3.12，converter 使用 Python 3.12。各子项目的环境用于其独立工具和开发；一个子项目的 `.venv` 不会自动成为另一个解释器的导入路径。
+Child development/CLI environments remain independent and do not implicitly extend another interpreter's path.
 
-## 模块分工
+## Module ownership
 
-| 文件 | 责任 |
+| Module | Responsibility |
 | --- | --- |
-| `cli.py` | 参数解析、命令分派、退出码 |
-| `configuration.py` | TOML、命令行覆盖、校验与路径解析 |
-| `robot_client.py` | 对接现有 SDK 的 ZMQ 协议、超时、错误响应与资源关闭 |
-| `gello.py` | 显式传入主手校准、主从方向与启动相对映射 |
-| `control.py` | JS 定位、启动检查、频率控制、跟随循环、录制按键 |
-| `recording.py` | raw v1/v2 session/episode、有界异步队列、保存/丢弃/`.partial` |
-| `camera.py` | RGB-D 采集生命周期、独立预览进程、有界无损图像队列 |
-| `workflow.py` | 设备预检、进程、信号、客户端组合、安全退出、转换器子进程 |
+| cli.py | Parsing, dispatch and exit codes |
+| configuration.py | TOML/CLI precedence, validation and paths |
+| robot_client.py | Existing SDK wire protocol, timeouts/errors/cleanup |
+| gello.py | Explicit leader calibration, direction and alignment |
+| control.py | JS positioning, startup guards, rates, following and keys |
+| recording.py | Raw v1/v2 sessions, bounded writers, save/discard/partial |
+| camera.py | RGB-D lifecycle, preview subprocess and lossless image writers |
+| workflow.py | Preflight, processes/signals, client composition, cleanup/conversion |
 
-主手库保持上游读取接口；controller 不导入 GELLO 的应用命令模块。CAN 与硬件保护属于 SDK；时间戳对齐和数据转换属于 converter。camera-realsense 提供独立 RGB-D 帧及主机时间映射，controller 保存 raw；RGB/深度匹配和单位转换留给 converter。
+GELLO keeps its upstream reading interfaces. CAN/protection stays in SDK, acquisition/host clocks in camera, matching/conversion in converter. Do not import the GELLO application command module into controller.
 
-## 修改原则
+## Changes
 
-- Python 使用四空格缩进、公开接口类型标注、`snake_case` 函数/模块和 `PascalCase` 类名，使用 Ruff 检查与格式化。
-- 设备实例在 workflow 中创建并统一释放；新步骤失败时仍需完成之前已获取资源的清理。
-- 使用单调时钟安排控制周期和记录相对时序；墙钟用于诊断。当前 raw 的 observation 是 action 下发后的反馈，修改配对语义必须同时评估转换与训练用途。
-- 保持 RPC 等待有界。REQ 请求超时或被中断后关闭该 socket，退出回零使用独立客户端。
-- 录制使用有界队列，写盘或队列错误必须显式上报；失败数据保持 `.partial`。保存中断不能遗留等待 sentinel 的线程。
-- 退出时先结束硬件控制，再做耗时刷新与转换。不要跳过 JS 退出流程或在退出期间切换普通 J 模式。
-- `scripts/` 保留五个 Shell 入口：一个负责安装，四个只调用 controller CLI。原入口默认无相机，新相机入口显式启用 camera 与预览；不要在启动脚本中复制运行流程。
-- 校准写在配置文件中，通过 `DynamixelRobotConfig` 传给 GELLO；不要为当前串口修改库中的全局端口表。
+Use four spaces, public type annotations, snake_case functions/modules and PascalCase classes. Keep resources owned by the workflow and release previously acquired resources when later initialization fails.
 
-## 检查与测试
+Use monotonic scheduling/timing and wall clock for diagnosis. Raw observations follow the sent action; changing pairing semantics requires evaluating conversion/training. RPC waits are bounded; close interrupted/timed-out REQ sockets and use a fresh client for exit zeroing.
 
-从 controller 根目录运行：
+Bounded persistence failures stay visible/partial. Interrupted saving must not leave writers waiting forever. Clean hardware before expensive flushing/conversion; preserve JS cleanup without resetting or changing motion mode.
+
+There are five shell entry points: setup and four thin wrappers. Do not duplicate runtime logic in them. Camera variants enable capture/preview, legacy variants stay camera-free. Pass calibration through DynamixelRobotConfig, not a library global port map.
+
+## Validation
+
+Run from the root:
 
 ```bash
-uv run --frozen ruff check src tests
-uv run --frozen ruff format --check src tests
-uv run --frozen pytest
-bash -n scripts/*.sh
+make lint
+make docs
+make test
+make verify
 uv build
 ```
 
-pytest 的 `tests/test_*.py` 覆盖配置优先级、SDK wire protocol、启动检查、JS 步长、录制、信号与清理顺序。测试不访问硬件。
-
-完整测试还会调用 `third-party/lerobot-converter/.venv/bin/python` 执行真实数值/RGB/RGB-D 转换、视频解码与米制深度读回；未安装该环境时跳过这项测试。安装环境后可单独执行：
+Tests cover configuration, SDK protocol, startup/JS limits, recording, signals and cleanup without physical devices. Converter integration uses its separate interpreter for real numerical/RGB/RGB-D conversion, video decoding and meter-depth readback. Missing converter environment is explicitly skipped:
 
 ```bash
 uv run --frozen pytest -m integration
 uv run --frozen pytest -m "not integration"
 ```
 
-没有全仓覆盖率门槛。为行为变化增加针对性测试，尤其是异常、取消和数据兼容；避免只复述实现的测试。
+There is no global coverage threshold. Add meaningful regressions for behavioral changes, particularly errors, cancellation and data compatibility.
 
-修改 GELLO 后，在其目录执行 `uv run --frozen pytest`，并运行现有 CI 的 lint：
+After GELLO changes, run its pytest from that checkout and its existing CI lint:
 
 ```bash
 uv run --frozen ruff check src tests experiments scripts --select E9,F63,F7,F82
 ```
 
-不要格式化无关上游文件；必要行为适配写入本地 `src/`。当前 GELLO 使用
-`agilex_gello_software` 命名空间和 PyPI `dynamixel-sdk==4.0.5`，没有嵌套 SDK、
-`gello/` 导入或离线上游审计命令。共享依赖变化同步更新 GELLO 与 controller 的
-`uv.lock`；SDK 单独修改时，使用其 README 中的检查流程。
+Preserve upstream style. Current GELLO uses agilex_gello_software and PyPI dynamixel-sdk 4.0.5; there is no required nested SDK, old gello namespace or offline upstream-audit command. Shared dependency changes update locks through uv; SDK changes use its own README checks.
 
-## Submodule 与多仓库工作流
+## Submodules
 
-`../agilex-gello-software/` 是独立工作副本，controller 内的 `third-party/agilex-gello-software/` 是另一个 Git 工作副本。它们不会自动同步文件。
-
-发布版本时，先在 GELLO 仓库提交、测试并推送，再让 controller submodule 检出该提交，最后在 controller 提交 gitlink。不要提交无法从远端获取的子项目提交。
+A neighboring independent GELLO checkout and the child inside this project do not synchronize automatically. Publish tested child changes before updating parent gitlinks, and do not reference unavailable commits.
 
 ```bash
 git -C third-party/agilex-gello-software status --short
@@ -90,20 +80,28 @@ git submodule status
 git diff --submodule
 ```
 
-开发期间子模块有未提交修改时，使用 `scripts/setup.sh --skip-submodules`。默认 setup 会拒绝脏子模块，避免把正在审阅的内容切回锁定版本。为普通使用者更新版本后，应验证一次干净检出的安装流程。
+Use setup --skip-submodules to preserve local work. Default setup rejects dirty children. Validate clean-checkout installation when publishing a baseline.
 
-## 提交与 PR
+## Commits and PRs
 
-使用简洁、祈使式主题，可采用 `feat:`、`fix:`、`refactor:`、`docs:`、`chore:` 前缀。将行为修改、必要测试和对应文档放在同一可审阅变更中。
+Use concise imperative conventional-prefix subjects. Keep behavior, necessary tests and corresponding docs in one reviewable change. PRs explain the concrete problem/result, affected repositories/revisions, actual checks, hardware status and relevant issues. Do not present simulations as physical acceptance.
 
-PR 描述应说明问题与最终行为、涉及仓库及版本、运行过的检查、真实硬件是否验证，以及相关 issue。终端工具通常不需要截图。不得把模拟测试描述为真实机械臂验收。
+## Data and documentation
 
-## 数据与文档
+Raw is immutable; LeRobot outputs are derived. Do not commit data, environments, artifacts or caches. Resolve runtime paths against project roots instead of personal home directories.
 
-`data/raw/` 是不可变输入，`data/lerobot/` 是可重新生成的输出。不要提交采集数据、虚拟环境、构建产物和缓存。路径相对于仓库计算，不写死个人 home 目录。
+Update both READMEs, affected configuration/docs and CHANGELOG when behavior changes. Add assets under the matching docs/en/assets and docs/zh/assets only when content exists. Preserve third-party sources/licenses in THIRD_PARTY_NOTICES.
 
-参数或默认行为变化时同步更新 README、`config/default.toml`、`docs/reference/`、CHANGELOG 和必要测试。保留 `docs/assets/` 中的硬件资料。第三方代码的来源和许可文本记录在 `THIRD_PARTY_NOTICES.md`。
+## Camera changes
 
-## 相机修改的验证
+Run camera Pyright and unittest discovery in its directory. Run converter dataset-extra pytest and isolated Ruff there. Cross-repository changes require a real root RGB-D round trip checking native values, matching, unchanged raw and camera-failure JS cleanup. Physical USB bandwidth, exposure latency and sustained rate need separate acceptance.
 
-相机库目录运行 `uv run --frozen pyright` 和 `uv run --frozen python -m unittest discover -s tests -v`。转换器目录运行 `uv run --frozen --extra dataset pytest` 和 `uv run --frozen --extra dataset ruff check --isolated .`。跨仓修改需要根目录真实 RGB-D round trip；确认 PNG/深度数值、时间匹配、raw 不变以及相机故障时的 JS 清理。实机 USB 带宽、曝光延迟和持续帧率另行验收，不能从模拟测试推断。
+## Bilingual docs and CI
+
+English README.md and Chinese README.zh-CN.md are paired. User pages under docs/en and docs/zh use identical relative paths and top language links. Keep AI rules/stage records out of user manuals.
+
+Make sync prepares only root development dependencies, not submodule upgrades/system/device configuration; full setup remains separate. Make docs validates real local links, routing and paired executable examples. Prose translation still needs review. Root mypy, coverage threshold and pre-commit are not configured and are not reported as passed.
+
+GitHub CI reuses make sync / make verify. Private children require a repository read-only SUBMODULES_READ_TOKEN because default GITHUB_TOKEN may not span repositories. CI does not install the independent converter dataset environment, so integration skips are explicit; this is not full six-repository acceptance. Local checks do not imply the unpublished workflow ran remotely.
+
+Project-wide licensing is undecided: preserve LICENSE's status rather than inventing license terms. Root/child repositories remain independent; documentation normalization does not automatically propagate to other projects.

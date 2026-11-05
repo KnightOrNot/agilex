@@ -1,5 +1,15 @@
 # 架构与数据流
 
+[English](../en/index.md) | 简体中文
+
+
+## 导航
+
+- [安装](installation.md)与[用法](usage.md)
+- [CLI](reference/cli.md)、[配置](reference/config.md)与[子模块配置](reference/submodule-config.md)
+- [相机与同步](cameras.md)、[故障排查](reference/errors.md)
+- [项目首页](../../README.zh-CN.md)与[贡献指南](../../CONTRIBUTING.zh-CN.md)
+
 项目有两个并列入口，共用设备配置、硬件互斥锁和底层客户端：命令行 controller
 负责跟随与 raw 录制，浏览器数采负责按键采集并直接写入 LeRobot。
 
@@ -103,8 +113,8 @@ raw v1/v2 的关节行包含：
 
 | 项目 | 使用与架构 | 贡献指南 |
 | --- | --- | --- |
-| GELLO | [README](../third-party/agilex-gello-software/README.md) / [架构](../third-party/agilex-gello-software/docs/index.md) | [CONTRIBUTING](../third-party/agilex-gello-software/CONTRIBUTING.md) |
-| SDK | [README](../third-party/agilex-sdk-python/README.md) / [协议](../third-party/agilex-sdk-python/docs/index.md) | [CONTRIBUTING](../third-party/agilex-sdk-python/CONTRIBUTING.md) |
-| Camera | [README](../third-party/camera-submodule-d455f/README.md) / [采集 API](../third-party/camera-submodule-d455f/docs/stream.md) | [CONTRIBUTING](../third-party/camera-submodule-d455f/CONTRIBUTING.md) |
-| Converter | [README](../third-party/lerobot-converter/README.md) / [数据流](../third-party/lerobot-converter/docs/index.md) | [CONTRIBUTING](../third-party/lerobot-converter/CONTRIBUTING.md) |
-| Adapters | [README](../third-party/agilex-adapters/README.md) | [CONTRIBUTING](../third-party/agilex-adapters/CONTRIBUTING.md) |
+| GELLO | [README](../../third-party/agilex-gello-software/README.md) | 未提供 |
+| SDK | [README](../../third-party/agilex-sdk-python/README.md) | 未提供 |
+| Camera | [README](../../third-party/camera-submodule-d455f/README.md) / [采集 API](../../third-party/camera-submodule-d455f/docs/stream.md) | [CONTRIBUTING](../../third-party/camera-submodule-d455f/CONTRIBUTING.md) |
+| Converter | [README](../../third-party/lerobot-converter/README.md) / [数据流](../../third-party/lerobot-converter/docs/index.md) | [CONTRIBUTING](../../third-party/lerobot-converter/CONTRIBUTING.md) |
+| Adapters | [README](../../third-party/agilex-adapters/README.md) | 未提供 |

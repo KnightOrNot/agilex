@@ -1,6 +1,8 @@
 # 配置参考
 
-默认配置位于 [config/default.toml](../../config/default.toml)，命令行 controller 与
+[English](../../en/reference/config.md) | 简体中文
+
+默认配置位于 [config/default.toml](../../../config/default.toml)，命令行 controller 与
 浏览器数采 `agilex-data-collection` 共用这一份文件。显式 `--config FILE` 选择另一份
 TOML；未写字段由内置默认值补全。未知表、未知字段、非法维度和非有限数值会在
 硬件工作之前拒绝。命令行显式值优先。`[collection]` 只由浏览器数采解析，controller
@@ -85,7 +87,7 @@ uv run agilex-controller record --config config/experiment.toml \
   --hz 50 --task "pick object" --skip-conversion
 ```
 
-修改设备配置后先执行只读 `read` 并核对各轴与夹爪，再进行运动验证。
+修改设备配置后先核对配置与设备反馈；`read` 初始化会关闭主手扭矩，不属于严格只读。运动验证需现场确认。
 
 ## camera
 
@@ -145,7 +147,7 @@ depth_enabled = true
 
 `max_skew_ms` 是 RGB、深度与机器人反馈之间允许的主机单调时钟偏差；
 `watchdog_s` 是控制心跳超时。`position_tolerance_deg` 是启动回零、GELLO 对齐和
-退出回零的每轴到位容差，当前用户授权值为 1.1°（J3 零位即机械上限，输出侧约
+退出回零的每轴到位容差，浏览器当前用户授权值为 1.1°（J3 零位即机械上限，输出侧约
 0.5° 柔度）。不得通过扣除 offset、切换控制模式或自动重标定来规避超差。
 
 `camera_enabled`、`depth_enabled` 控制是否打开相机与深度；`camera_mode` 取
@@ -155,3 +157,5 @@ depth_enabled = true
 
 独立的最小配置文件仍可使用扁平键（不写 `[collection]` 表）；多了一份
 `[collection]` 的共享文件则只读取该表。未知键会报错。
+
+CLI 的 `move_js` 默认容差仍为 1.0°，不读取 `[collection]` 的 1.1°；不要混用两条入口的验收值。

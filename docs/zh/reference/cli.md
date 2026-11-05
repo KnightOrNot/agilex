@@ -1,5 +1,7 @@
 # CLI 参考
 
+[English](../../en/reference/cli.md) | 简体中文
+
 公共形式：
 
 ```bash
