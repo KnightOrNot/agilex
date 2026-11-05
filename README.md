@@ -18,13 +18,14 @@ RGB-D 预览并直接在网页中浏览、合并、上传或删除 LeRobot 数�
 | --- | --- |
 | controller，Python 3.11 | 应用配置、客户端组合、进程生命周期、跟随和 raw 录制 |
 | `src/agilex_data_collection/`，Python 3.12 | 浏览器数采、硬件 worker、预览、LeLab 集成 |
-| `agilex-adapters/`，Python 3.12 | LeRobot Robot/Teleoperator 协议适配与私有 IPC 客户端 |
-| `agilex-gello-software/`，Python 3.11 | GELLO/Dynamixel 读取、设备校准、上游通用实验工具 |
-| `agilex-sdk-python/`，Python 3.11 | CAN 硬件、运动控制、反馈、ZMQ 服务 |
-| `camera-realsense/`，Python 3.11 | RGB-D 采集、设备时间戳、深度单位与标定 |
-| `lerobot-converter/`，Python 3.12 | raw 校验、时间戳重采样、LeRobot 数据集与质量报告 |
+| `third-party/agilex-adapters/`，Python 3.12 | LeRobot Robot/Teleoperator 协议适配与私有 IPC 客户端 |
+| `third-party/agilex-gello-software/`，Python 3.11 | GELLO/Dynamixel 读取、设备校准、上游通用实验工具 |
+| `third-party/agilex-sdk-python/`，Python 3.11 | CAN 硬件、运动控制、反馈、ZMQ 服务 |
+| `third-party/camera-submodule-d455f/`，Python 3.11 | RGB-D 采集、设备时间戳、深度单位与标定 |
+| `third-party/lerobot-converter/`，Python 3.12 | raw 校验、时间戳重采样、LeRobot 数据集与质量报告 |
 
 ```text
+third-party/                  五个独立 Git submodule
 src/agilex_controller/         命令行应用与 raw 录制
 src/agilex_data_collection/    浏览器数采与 LeLab 集成
 config/default.toml            两个入口共用的全部配置
@@ -44,9 +45,13 @@ data/lerobot/app/              浏览器数采直接写入的数据集
 本地 editable 依赖安装；SDK 服务、converter 和浏览器数采使用各自的解释器，
 通过 IPC、ZMQ 和文件协作。当前 GELLO 的公开接口位于
 `src/agilex_gello_software/`，DynamixelSDK 使用其锁定的 PyPI 4.0.5。详见
-[GELLO 开发文档](agilex-gello-software/README.md)。
+[GELLO 开发文档](third-party/agilex-gello-software/README.md)。
 
 ## 安装
+
+子模块更新使用 `git submodule sync --recursive` 后再
+`git submodule update --init`；只有显式升级才加 `--remote`。
+迁移与环境重建步骤见[安装指南](docs/installation.md)。后续开发使用 `dev`。
 
 在 Linux 上 clone 项目，然后运行：
 
@@ -92,14 +97,14 @@ Python 3.11 环境不会安装这些依赖。
 uv run agilex-controller config
 uv run agilex-controller read
 uv run agilex-controller status
-uv run --project camera-realsense camera-realsense info --profiles
+uv run --project third-party/camera-submodule-d455f camera-realsense info --profiles
 ```
 
 `read` 只打开主手串口；`status` 调用 SDK 的只读检查，要求 CAN 已配置。
 手工配置默认 CAN：
 
 ```bash
-./agilex-sdk-python/scripts/config_can.sh
+./third-party/agilex-sdk-python/scripts/config_can.sh
 ```
 
 各字段含义见[配置参考](docs/reference/config.md)。路径字段相对于项目根目录解析。
@@ -309,7 +314,7 @@ uv run agilex-controller convert data/raw/SESSION data/lerobot/DATASET
 将 `SESSION` 和 `DATASET` 替换为实际目录。转换器忽略 `.partial`，拒绝覆盖
 已存在的输出；成功后生成 `meta/`、`data/`、RGB `videos/` 和
 `quality_report.json`，深度以米制浮点图像无损嵌入 Parquet。同步算法和格式
-说明见[转换器文档](lerobot-converter/README.md)。
+说明见[转换器文档](third-party/lerobot-converter/README.md)。
 
 ## 常见问题
 
@@ -319,7 +324,7 @@ uv run agilex-controller convert data/raw/SESSION data/lerobot/DATASET
 | “启动跟随”不可点击 | 填写任务描述并勾选运动确认；已有会话时先停止并等待清理 |
 | `POST /api/start ... 409 Conflict` | 查看网页提示；未确认、任务为空或会话未结束时后端会拒绝 |
 | 8000 端口被占用 | 停止旧服务，或 `serve --port 8001` 后打开对应端口 |
-| 提示 `CAN interface can0 is DOWN` | 执行 `./agilex-sdk-python/scripts/config_can.sh` 后重试 |
+| 提示 `CAN interface can0 is DOWN` | 执行 `./third-party/agilex-sdk-python/scripts/config_can.sh` 后重试 |
 | `startup_zero` / `exit_zero`、`JS positioning failed` | 容差为 1.1°；查看日志 `[position_result]` 的六轴反馈与残差，不跳过校验 |
 | 相机快速模式不稳定 | 把 `[collection].camera_mode` 改为 `"slow"`，停止会话后重启 |
 | 深度或点云预览不可用 | 确认 `depth_enabled = true` 且已进入 `following`；点云要求无畸变 rectified 深度标定 |
@@ -347,7 +352,7 @@ uv run agilex-controller convert data/raw/SESSION data/lerobot/DATASET
 uv run --frozen pytest
 uv run --frozen ruff check src tests
 uv run --frozen ruff format --check src tests
-uv run --project agilex-adapters --extra app pytest agilex-adapters/tests -q
+uv run --project third-party/agilex-adapters --extra app pytest third-party/agilex-adapters/tests -q
 uv build
 ```
 

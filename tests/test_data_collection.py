@@ -25,7 +25,7 @@ def test_serve_prepares_can_before_exec_only_for_hardware(
 ):
     import agilex_data_collection as entry
 
-    adapters = tmp_path / "agilex-adapters"
+    adapters = tmp_path / "third-party/agilex-adapters"
     (adapters / ".venv/bin").mkdir(parents=True)
     (adapters / "pyproject.toml").touch()
     (adapters / ".venv/bin/python").touch()
@@ -65,7 +65,7 @@ def test_can_setup_uses_hardware_toml_and_shared_lock(tmp_path, monkeypatch, ext
             '[robot]\ncan_interface = "can7"\ncan_bitrate = 500000\n'
             '[collection]\ndata_root = "data/lerobot/app"\n'
         )
-    script = tmp_path / "agilex-sdk-python/scripts/config_can.sh"
+    script = tmp_path / "third-party/agilex-sdk-python/scripts/config_can.sh"
     script.parent.mkdir(parents=True)
     script.touch()
     events = []
@@ -91,7 +91,7 @@ def test_can_setup_uses_hardware_toml_and_shared_lock(tmp_path, monkeypatch, ext
 def test_can_setup_failure_prevents_server_start(tmp_path, monkeypatch):
     import agilex_data_collection as entry
 
-    adapters = tmp_path / "agilex-adapters"
+    adapters = tmp_path / "third-party/agilex-adapters"
     (adapters / ".venv/bin").mkdir(parents=True)
     (adapters / "pyproject.toml").touch()
     (adapters / ".venv/bin/python").touch()

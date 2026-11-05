@@ -33,5 +33,5 @@ slow 直接测速低档，manual 使用主项目安装配置中的相机分辨�
 旧 controller 的显式 profile 继续使用原帧率，不被库的 auto 默认值覆盖。
 数据集 FPS 仍由应用独立配置，90 FPS 相机不会自动生成 90 FPS 数据集。
 
-细节见[相机配置参考](../../camera-realsense/docs/reference/config.md)与
+细节见[相机配置参考](../../third-party/camera-submodule-d455f/docs/reference/config.md)与
 [配置参考](config.md)。本轮未进行相机或机械臂实测。

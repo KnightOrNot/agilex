@@ -22,7 +22,7 @@ setup 从脚本位置找到仓库，初始化五个一级 submodule，通过 pye
 uv run agilex-data-collection setup
 ```
 
-它同步 `agilex-adapters/.venv`，安装 LeRobot（官方 v0.6.0）、LeLab（固定提交）
+它同步 `third-party/agilex-adapters/.venv`，安装 LeRobot（官方 v0.6.0）、LeLab（固定提交）
 和网页依赖，并构建前端，需要网络和 Node。默认 Python 3.12.14；已有完整解释器
 可用 `setup --python /path/to/python3.12`。根目录的 Python 3.11 环境不会安装
 这些依赖，两个环境互不替换。
@@ -44,18 +44,19 @@ uv run agilex-data-collection setup
 已有 pyenv 与 uv 时：
 
 ```bash
+git submodule sync --recursive
 git submodule update --init
 pyenv install -s "$(pyenv latest -k 3.11)"
 pyenv install -s "$(pyenv latest -k 3.12)"
 python311="$(PYENV_VERSION="$(pyenv latest -k 3.11)" pyenv which python)"
 python312="$(PYENV_VERSION="$(pyenv latest -k 3.12)" pyenv which python)"
 
-UV_NO_MANAGED_PYTHON=1 uv sync --project agilex-sdk-python --frozen --python "$python311"
-UV_NO_MANAGED_PYTHON=1 uv sync --project agilex-gello-software --frozen --python "$python311"
-UV_NO_MANAGED_PYTHON=1 uv sync --project lerobot-converter --frozen --extra dataset --python "$python312"
-UV_NO_MANAGED_PYTHON=1 uv sync --project camera-realsense --frozen --python "$python311"
+UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-sdk-python --frozen --python "$python311"
+UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-gello-software --frozen --python "$python311"
+UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/lerobot-converter --frozen --extra dataset --python "$python312"
+UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/camera-submodule-d455f --frozen --python "$python311"
 UV_NO_MANAGED_PYTHON=1 uv sync --frozen --python "$python311"
-UV_NO_MANAGED_PYTHON=1 uv sync --project agilex-adapters --extra app --python "$python312"
+UV_NO_MANAGED_PYTHON=1 uv sync --project third-party/agilex-adapters --extra app --python "$python312"
 mkdir -p data/raw data/lerobot
 ```
 
@@ -64,7 +65,27 @@ mkdir -p data/raw data/lerobot
 
 GELLO 和 camera-realsense 包通过根目录 `tool.uv.sources` 中的本地 editable 路径安装。controller 与 GELLO 独立 CLI 各自安装相同代码的基础依赖，这是两个独立环境；无需将多个虚拟环境加入 PYTHONPATH。
 
-GELLO 当前使用 `agilex_gello_software` 导入命名空间和锁定的 PyPI DynamixelSDK 4.0.5。开发期间使用 `--skip-submodules` 保留本地改动。初始化应使用主项目固定的子模块提交；需要主动升级时才运行 `git submodule update --init --remote`，并在测试通过后提交新的引用。
+GELLO 当前使用 `agilex_gello_software` 导入命名空间和锁定的 PyPI DynamixelSDK 4.0.5。开发期间使用 `--skip-submodules` 保留本地改动。初始化应使用主项目固定的子模块提交；需要主动升级时才运行 `git submodule update --init --remote`（按 `.gitmodules` 的 `branch = main`），并在测试通过后提交新的引用。
+
+更新已有工作副本前，将原子模块目录中的 `.venv` 移到仓库外备份。
+迁移后的入口脚本必须由新环境生成，再按以下顺序更新：
+
+```bash
+git pull --ff-only
+git submodule sync --recursive
+git submodule update --init
+./scripts/setup.sh --skip-system --skip-submodules
+uv run agilex-data-collection setup
+```
+
+五个子模块集中在 `third-party/`；相机远程仓库为
+`git@github.com:KnightOrNot/camera-realsense-d455f.git`，本地目录为
+`third-party/camera-submodule-d455f/`，包名/命令仍为 `camera-realsense`。
+目录迁移后旧 `.venv` 的入口脚本可能仍指向旧绝对路径。请先将各子模块的
+`.venv` 移到仓库外备份，再运行上述 setup 重建；不要修补旧入口脚本。
+有未提交的子模块修改时先保存工作，再执行更新；普通更新检出主项目固定的提交，
+不自动跟随远程分支。GELLO 的可选 Menagerie 资产仍按需初始化。
+后续功能与 Python 版本迁移在 `dev` 分支进行，`main` 保留已验证的稳定基线。
 
 ## 安装验证
 
@@ -90,7 +111,7 @@ sudo usermod -aG dialout "$USER"
 注销并重新登录后检查 `/dev/serial/by-id/`，修改 `config/default.toml` 中的 port 与标定参数。不要只凭串口名沿用另一台主手的校准。
 
 ```bash
-./agilex-sdk-python/scripts/config_can.sh can0 1000000 100
+./third-party/agilex-sdk-python/scripts/config_can.sh can0 1000000 100
 uv run agilex-controller read --json
 uv run agilex-controller status
 ```
@@ -99,10 +120,10 @@ uv run agilex-controller status
 
 ## RealSense 首次接入
 
-查看[相机安装指南](../camera-realsense/docs/installation.md)配置 Linux udev 权限，重新插拔设备；setup 不会自动安装 udev 规则。推荐 USB 3 数据连接，避免与其他采集程序争用设备。
+查看[相机安装指南](../third-party/camera-submodule-d455f/docs/installation.md)配置 Linux udev 权限，重新插拔设备；setup 不会自动安装 udev 规则。推荐 USB 3 数据连接，避免与其他采集程序争用设备。
 
 ```bash
-uv run --project camera-realsense camera-realsense info --profiles
+uv run --project third-party/camera-submodule-d455f camera-realsense info --profiles
 ```
 
 根据实际 profile 设置 controller 的 `[camera]`，不要用相机库独立实验的 TOML 代替 controller 配置。首次联调按 README 先做只读检查，再启动跟随和短集采集；检查质量报告后再长时间采集。无图形桌面保持 `preview=false`。

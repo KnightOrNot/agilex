@@ -13,7 +13,7 @@ from agilex_controller.control import _sample_from_cycle
 from agilex_controller.recording import RawEpisodeRecorder
 
 ROOT = Path(__file__).resolve().parents[1]
-CONVERTER_PYTHON = ROOT / "lerobot-converter/.venv/bin/python"
+CONVERTER_PYTHON = ROOT / "third-party/lerobot-converter/.venv/bin/python"
 
 
 @pytest.mark.integration

@@ -81,8 +81,8 @@ class SafetyConfig:
 
 @dataclass(frozen=True)
 class PathsConfig:
-    sdk_project: str = "agilex-sdk-python"
-    converter_project: str = "lerobot-converter"
+    sdk_project: str = "third-party/agilex-sdk-python"
+    converter_project: str = "third-party/lerobot-converter"
     raw_data_root: str = "data/raw"
     lerobot_data_root: str = "data/lerobot"
 

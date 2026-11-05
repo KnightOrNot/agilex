@@ -65,7 +65,7 @@ uv run agilex-controller status
 
 先验证 converter 的 Python 3.12 环境及 `dataset` extra。目标目录必须不存在；不要把输出指向 raw 输入目录。失败输出可审阅后移走，再选择新目录重试。
 
-FFmpeg/TorchCodec 问题属于 converter 环境：执行 `ffmpeg -version` 和 `lerobot-converter/.venv/bin/python -c "from torchcodec.decoders import VideoDecoder"`。时间序列、维度或 raw 格式错误依据 converter 的错误位置排查，保持原始数据不变。
+FFmpeg/TorchCodec 问题属于 converter 环境：执行 `ffmpeg -version` 和 `third-party/lerobot-converter/.venv/bin/python -c "from torchcodec.decoders import VideoDecoder"`。时间序列、维度或 raw 格式错误依据 converter 的错误位置排查，保持原始数据不变。
 
 ## 浏览器数采
 

@@ -52,8 +52,8 @@ preview = false
 
 [paths]
 # Relative paths resolve against the repository root, not the shell's cwd.
-sdk_project = "agilex-sdk-python"
-converter_project = "lerobot-converter"
+sdk_project = "third-party/agilex-sdk-python"
+converter_project = "third-party/lerobot-converter"
 raw_data_root = "data/raw"
 lerobot_data_root = "data/lerobot"
 

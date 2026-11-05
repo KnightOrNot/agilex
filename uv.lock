@@ -21,8 +21,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "agilex-gello-software", editable = "agilex-gello-software" },
-    { name = "camera-realsense", editable = "camera-realsense" },
+    { name = "agilex-gello-software", editable = "third-party/agilex-gello-software" },
+    { name = "camera-realsense", editable = "third-party/camera-submodule-d455f" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "pyzmq", specifier = ">=26.0" },
 ]
@@ -36,7 +36,7 @@ dev = [
 [[package]]
 name = "agilex-gello-software"
 version = "0.1.0"
-source = { editable = "agilex-gello-software" }
+source = { editable = "third-party/agilex-gello-software" }
 dependencies = [
     { name = "dynamixel-sdk" },
     { name = "numpy" },
@@ -98,7 +98,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/3e/38/7859ff46355f76f8d
 [[package]]
 name = "camera-realsense"
 version = "0.1.0"
-source = { editable = "camera-realsense" }
+source = { editable = "third-party/camera-submodule-d455f" }
 dependencies = [
     { name = "numpy" },
     { name = "opencv-python" },

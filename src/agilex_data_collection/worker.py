@@ -28,7 +28,8 @@ from .diagnostics import report_worker_error
 def check_can_ready(channel: str, bitrate: int) -> None:
     """Inspect SocketCAN configuration without opening or enabling hardware."""
     hint = (
-        f"run ./agilex-sdk-python/scripts/config_can.sh {channel} {bitrate} "
+        "run ./third-party/agilex-sdk-python/scripts/config_can.sh "
+        f"{channel} {bitrate} "
         "before starting follow"
     )
     try:

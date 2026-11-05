@@ -66,8 +66,8 @@ task 必须非空；queue_size 与 dataset_fps 必须为正整数。50 Hz raw �
 
 ```toml
 [paths]
-sdk_project = "agilex-sdk-python"
-converter_project = "lerobot-converter"
+sdk_project = "third-party/agilex-sdk-python"
+converter_project = "third-party/lerobot-converter"
 raw_data_root = "data/raw"
 lerobot_data_root = "data/lerobot"
 ```

@@ -57,7 +57,7 @@ uv build
 
 pytest 的 `tests/test_*.py` 覆盖配置优先级、SDK wire protocol、启动检查、JS 步长、录制、信号与清理顺序。测试不访问硬件。
 
-完整测试还会调用 `lerobot-converter/.venv/bin/python` 执行真实数值/RGB/RGB-D 转换、视频解码与米制深度读回；未安装该环境时跳过这项测试。安装环境后可单独执行：
+完整测试还会调用 `third-party/lerobot-converter/.venv/bin/python` 执行真实数值/RGB/RGB-D 转换、视频解码与米制深度读回；未安装该环境时跳过这项测试。安装环境后可单独执行：
 
 ```bash
 uv run --frozen pytest -m integration
@@ -79,12 +79,12 @@ uv run --frozen python -m agilex_gello_software.upstream
 
 ## Submodule 与多仓库工作流
 
-`../agilex-gello-software/` 是独立工作副本，controller 内的同名目录是另一个 Git 工作副本。它们不会自动同步文件。
+`../agilex-gello-software/` 是独立工作副本，controller 内的 `third-party/agilex-gello-software/` 是另一个 Git 工作副本。它们不会自动同步文件。
 
 发布版本时，先在 GELLO 仓库提交、测试并推送，再让 controller submodule 检出该提交，最后在 controller 提交 gitlink。不要提交无法从远端获取的子项目提交。
 
 ```bash
-git -C agilex-gello-software status --short
+git -C third-party/agilex-gello-software status --short
 git submodule status
 git diff --submodule
 ```

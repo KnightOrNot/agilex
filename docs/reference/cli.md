@@ -57,7 +57,7 @@ record 的额外参数：
 | --- | --- |
 | `--raw-data-root PATH` | `data/raw` |
 | `--lerobot-data-root PATH` | `data/lerobot` |
-| `--converter-project PATH` | `lerobot-converter` |
+| `--converter-project PATH` | `third-party/lerobot-converter` |
 | `--task TEXT` | session 的非空任务描述 |
 | `--record-queue-size N` | `500`，有界异步队列 |
 | `--dataset-fps FPS` | `30`，仅影响离线输出 |
@@ -97,7 +97,7 @@ uv run agilex-data-collection setup [--python 3.12.14]
 uv run agilex-data-collection serve [--simulate] [--port 8000] [--config FILE]
 ```
 
-`setup` 同步 `agilex-adapters/.venv` 并安装 LeRobot、LeLab 及网页依赖，需要网络。
+`setup` 同步 `third-party/agilex-adapters/.venv` 并安装 LeRobot、LeLab 及网页依赖，需要网络。
 `serve` 启动网页与硬件 worker；默认读取 `config/default.toml` 的 `[collection]`，
 真机模式先按 `[robot]` 配置 CAN。`--simulate` 不访问机械臂、主手或相机，也跳过
 CAN 配置，但仍写入数据目录。`--port` 取 1..65535，默认 8000。

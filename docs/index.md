@@ -32,7 +32,7 @@ flowchart LR
 | controller + GELLO 基础包 + camera | 根目录 `.venv`，3.11 | GELLO 串口、相机、机器人客户端、应用状态、raw |
 | SDK server | SDK 自己的 `.venv`，3.11 | CAN、机械臂反馈与命令 |
 | converter | converter 自己的 `.venv`，3.12 | 只读 raw，写新 LeRobot 数据集 |
-| agilex-data-collection 网页 | `agilex-adapters/.venv`，3.12 | 浏览器 UI、预览编码、LeLab 集成 |
+| agilex-data-collection 网页 | `third-party/agilex-adapters/.venv`，3.12 | 浏览器 UI、预览编码、LeLab 集成 |
 | 硬件 worker + 适配器 | 根环境与 adapters 环境，3.11/3.12 | 复用 controller 的设备初始化与清理 |
 
 controller 的 `RobotClient` 是现有 SDK wire protocol 的应用侧适配器。本次未修改 SDK；协议仍为 ZMQ REQ/REP 和 pickle 的 `method/args` 请求。服务默认监听本机，部署时保持在可信网络范围内。
@@ -103,8 +103,8 @@ raw v1/v2 的关节行包含：
 
 | 项目 | 使用与架构 | 贡献指南 |
 | --- | --- | --- |
-| GELLO | [README](../agilex-gello-software/README.md) / [架构](../agilex-gello-software/docs/index.md) | [CONTRIBUTING](../agilex-gello-software/CONTRIBUTING.md) |
-| SDK | [README](../agilex-sdk-python/README.md) / [协议](../agilex-sdk-python/docs/index.md) | [CONTRIBUTING](../agilex-sdk-python/CONTRIBUTING.md) |
-| Camera | [README](../camera-realsense/README.md) / [采集 API](../camera-realsense/docs/stream.md) | [CONTRIBUTING](../camera-realsense/CONTRIBUTING.md) |
-| Converter | [README](../lerobot-converter/README.md) / [数据流](../lerobot-converter/docs/index.md) | [CONTRIBUTING](../lerobot-converter/CONTRIBUTING.md) |
-| Adapters | [README](../agilex-adapters/README.md) | [CONTRIBUTING](../agilex-adapters/CONTRIBUTING.md) |
+| GELLO | [README](../third-party/agilex-gello-software/README.md) / [架构](../third-party/agilex-gello-software/docs/index.md) | [CONTRIBUTING](../third-party/agilex-gello-software/CONTRIBUTING.md) |
+| SDK | [README](../third-party/agilex-sdk-python/README.md) / [协议](../third-party/agilex-sdk-python/docs/index.md) | [CONTRIBUTING](../third-party/agilex-sdk-python/CONTRIBUTING.md) |
+| Camera | [README](../third-party/camera-submodule-d455f/README.md) / [采集 API](../third-party/camera-submodule-d455f/docs/stream.md) | [CONTRIBUTING](../third-party/camera-submodule-d455f/CONTRIBUTING.md) |
+| Converter | [README](../third-party/lerobot-converter/README.md) / [数据流](../third-party/lerobot-converter/docs/index.md) | [CONTRIBUTING](../third-party/lerobot-converter/CONTRIBUTING.md) |
+| Adapters | [README](../third-party/agilex-adapters/README.md) | [CONTRIBUTING](../third-party/agilex-adapters/CONTRIBUTING.md) |

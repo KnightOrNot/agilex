@@ -50,7 +50,7 @@ def main(argv: list[str] | None = None) -> int:
     serve.add_argument("--config", type=Path)
     args = parser.parse_args(argv)
     project = args.project.resolve()
-    adapters = project / "agilex-adapters"
+    adapters = project / "third-party/agilex-adapters"
     if not (adapters / "pyproject.toml").is_file():
         parser.error("--project must point to the controller checkout with submodules")
     uv = shutil.which("uv")

@@ -143,30 +143,30 @@ if [[ "$update_submodules" == true ]]; then
             fail "submodule $submodule_path 存在未提交内容；请先提交、暂存或移走后重试"
         fi
     done < <(git config --file .gitmodules --get-regexp path | awk '{print $2}')
-    git submodule sync
+    git submodule sync --recursive
     git submodule update --init
-    git -C agilex-gello-software submodule sync
+    git -C third-party/agilex-gello-software submodule sync
     # Older GELLO revisions used a source SDK; the current main pins PyPI 4.0.5.
-    if git -C agilex-gello-software config --file .gitmodules \
+    if git -C third-party/agilex-gello-software config --file .gitmodules \
         --get submodule.third_party/DynamixelSDK.path >/dev/null 2>&1; then
-        git -C agilex-gello-software submodule update --init third_party/DynamixelSDK
+        git -C third-party/agilex-gello-software submodule update --init third_party/DynamixelSDK
     fi
     if [[ "$install_simulation_assets" == true ]]; then
-        git -C agilex-gello-software submodule update \
+        git -C third-party/agilex-gello-software submodule update \
             --init third_party/mujoco_menagerie
     fi
 else
     log "[4/7] 检查 Git submodule"
 fi
 
-for submodule_path in agilex-sdk-python agilex-gello-software lerobot-converter camera-realsense; do
+for submodule_path in third-party/agilex-sdk-python third-party/agilex-gello-software third-party/lerobot-converter third-party/camera-submodule-d455f third-party/agilex-adapters; do
     [[ -f "$submodule_path/pyproject.toml" ]] \
         || fail "$submodule_path 尚未初始化；请取消 --skip-submodules"
 done
 
-if git -C agilex-gello-software config --file .gitmodules \
+if git -C third-party/agilex-gello-software config --file .gitmodules \
     --get submodule.third_party/DynamixelSDK.path >/dev/null 2>&1; then
-    [[ -f agilex-gello-software/third_party/DynamixelSDK/python/setup.py ]] \
+    [[ -f third-party/agilex-gello-software/third_party/DynamixelSDK/python/setup.py ]] \
         || fail "GELLO 的 DynamixelSDK 尚未初始化；请初始化该嵌套 submodule 后重试"
 fi
 
@@ -200,14 +200,14 @@ sync_project() {
 }
 
 log "[5/7] 使用 pyenv Python 同步 uv 环境"
-sync_project agilex-sdk-python
+sync_project third-party/agilex-sdk-python
 if [[ -n "$gello_extra" ]]; then
-    sync_project agilex-gello-software --extra "$gello_extra"
+    sync_project third-party/agilex-gello-software --extra "$gello_extra"
 else
-    sync_project agilex-gello-software
+    sync_project third-party/agilex-gello-software
 fi
-sync_project lerobot-converter --extra dataset
-sync_project camera-realsense
+sync_project third-party/lerobot-converter --extra dataset
+sync_project third-party/camera-submodule-d455f
 sync_project .
 
 log "[6/7] 创建数据目录并验证软件入口"
@@ -220,12 +220,12 @@ fi
 .venv/bin/python -c "from agilex_gello_software.agents.gello_agent import GelloAgent; from agilex_controller.configuration import load_config; load_config()"
 .venv/bin/python -c "from agilex_gello_software.agents.gello_agent import GelloAgent; import dynamixel_sdk"
 .venv/bin/python -c "from camera_realsense.stream import ColorStream; from PIL import Image"
-agilex-sdk-python/.venv/bin/agilex-sdk-python --help >/dev/null
-agilex-sdk-python/.venv/bin/agilex-sdk-python-server --help >/dev/null
-agilex-gello-software/.venv/bin/agilex-gello-software --help >/dev/null
-lerobot-converter/.venv/bin/lerobot-converter --help >/dev/null
+third-party/agilex-sdk-python/.venv/bin/agilex-sdk-python --help >/dev/null
+third-party/agilex-sdk-python/.venv/bin/agilex-sdk-python-server --help >/dev/null
+third-party/agilex-gello-software/.venv/bin/agilex-gello-software --help >/dev/null
+third-party/lerobot-converter/.venv/bin/lerobot-converter --help >/dev/null
 ffmpeg -version >/dev/null 2>&1 || fail "FFmpeg 不可用"
-lerobot-converter/.venv/bin/python -c \
+third-party/lerobot-converter/.venv/bin/python -c \
     "from torchcodec.decoders import VideoDecoder; print('TorchCodec 加载正常')"
 
 log "[7/7] 检查 GELLO 串口用户组"
