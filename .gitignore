@@ -19,11 +19,8 @@ dist/
 
 # Local AI tooling
 /.codex/
+/.claude/
 /.gstack/
-/.claude/*
-# Shared Claude configuration and hooks remain tracked
-!/.claude/settings.json
-!/.claude/hooks/
 
 # Local credentials
 /.aws/

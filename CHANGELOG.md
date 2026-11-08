@@ -4,6 +4,10 @@ All notable changes are recorded here in Keep a Changelog format. This project h
 
 ## [Unreleased]
 
+### Fixed
+
+- Made workflow unit tests independent of locally installed SDK and converter environments, so root-only CI can exercise cleanup ordering and occupied-endpoint protection.
+
 
 ## 0.2.1 — Unreleased
 

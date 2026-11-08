@@ -153,3 +153,16 @@ make verify
 - 未验证：本轮不访问设备，不运行第 5/6 项；Windows 实际桌面登录、相机 GUI 与持续吞吐仍保持前文待确认状态。
 
 上述记录是发布前已完成的检查及交付目标；实际推送和分支状态须以 Git 引用核对，不预填成功。后续每次修改在 dev-<任务名> 进行，自动化和用户实测均通过后才能 commit/合并 dev；main 发布流程细节待确认。
+
+
+## main/dev 同步前的 CI 修复检查点（2026-11-08，0.2.1）
+
+用户要求本地、远程 main 与远程 dev 完全一致。同步前本地/远程 dev 为 bb0c266，main 为 01bf012；两个提交只改了 .gitignore，版本沿用本次维护的 0.2.1。
+
+- 远端 protect-main 已生效：main 必须通过 PR 和 GitHub Actions 的 software 检查，禁止删除/强推。本次读取时 bypass 列表为空；没有修改或绕过规则。
+- 现有 [PR #1](https://github.com/KnightOrNot/agilex/pull/1) 被 [CI 运行 42462906959](https://github.com/KnightOrNot/agilex/actions/runs/42462906959) 阻塞：129 passed、2 failed、3 skipped。两个工作流单元测试意外依赖本机 SDK/converter 的 .venv，尚未到达目标断言就抛出 FileNotFoundError。
+- 在仅同步根 uv 环境、没有任何子模块 .venv 的临时源码副本中，先重现同样的两个失败。修复让测试在 pytest 临时目录提供解释器路径占位，并显式配置 SDK/converter 项目路径；原有清理顺序、错误传播和 CAN 前端口占用保护断言均保留，占位文件不会执行。
+- 修复后的干净副本定向测试：2 passed；完整 make verify：131 passed、3 skipped（6.87 s），跳过的是缺独立 converter 环境的既有集成回读。
+- 本机完整 make verify：134 passed（54.03 s），包含三项真实 converter 回读；Ruff、Shell 语法和文档检查通过。
+- 改动限于单元测试、英文 CHANGELOG 与本检查点；运行时代码、硬件配置、依赖/版本、子模块 gitlink 和 CI 规则均未改变。未访问硬件，不将软件结果记为实物验收。
+- 交付目标：推送测试修复，等待 PR 的远端 software 成功后通过普通 merge 合入 main，再将同一合并提交快进同步至本地 main/dev 和远端 dev；最终提交与 CI 结果以 PR 和分支引用为准。
