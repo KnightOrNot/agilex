@@ -21,9 +21,6 @@ dist/
 /.codex/
 /.claude/
 /.gstack/
-# Shared Claude configuration and hooks remain tracked
-!/.claude/settings.json
-!/.claude/hooks/
 
 # Local credentials
 /.aws/
