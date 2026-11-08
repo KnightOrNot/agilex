@@ -11,8 +11,8 @@ controller 与五个子模块统一使用 Python 3.12。根目录的 `requires-p
 ## 一键配置
 
 ```bash
-git clone --branch main git@github.com:KnightOrNot/agilex-controller.git
-cd agilex-controller
+git clone --branch main git@github.com:KnightOrNot/agilex.git
+cd agilex
 ./scripts/setup.sh
 ```
 
@@ -85,7 +85,7 @@ uv run agilex-data-collection setup
 有未提交的子模块修改时先保存工作，再执行更新；普通更新检出主项目固定的提交，
 不自动跟随远程分支。GELLO 的可选 Menagerie 资产仍按需初始化。
 Python 3.12 与 uv 迁移已合并至 `main`，已合并的 `dev` 分支不再保留。
-后续以 `main` 为基线，需要隔离改动时创建临时功能分支。
+普通使用安装稳定 main；开发集成到 dev，每次在独立 dev-<任务名> 工作分支修改，并遵守贡献指南的提交门槛。
 
 ## 安装验证
 

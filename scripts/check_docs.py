@@ -13,6 +13,7 @@ REQUIRED_FILES = (
     "AGENTS.md",
     "CLAUDE.md",
     "HABITS.md",
+    "SKILLS.md",
     ".ai-stage",
     "README.md",
     "README.zh-CN.md",

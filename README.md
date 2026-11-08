@@ -24,8 +24,8 @@ Both are first-class workflows. They share `config/default.toml` and the hardwar
 On Linux with Git and the required system dependencies available:
 
 ```bash
-git clone --branch main git@github.com:KnightOrNot/agilex-controller.git
-cd agilex-controller
+git clone --branch main git@github.com:KnightOrNot/agilex.git
+cd agilex
 ./scripts/setup.sh
 uv run agilex-data-collection setup
 ```

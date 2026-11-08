@@ -9,3 +9,5 @@
 - 工程入口：Make 调用已有 uv/Ruff/pytest 和实际文档检查，CI 复用相同目标；不为满足目录示意图建立空 assets、其他阶段或 Agent eval。
 - 后果：新会话以 HABITS → AGENTS → 当前阶段路由；不再往 CLAUDE 追加任务状态。`.agents/` 不再被 gitignore 排除。
 - 范围限制：仅根仓规范化；独立子模块的指令、代码、环境、gitlink 和 gstack 配置不改动。规范化整理时未获提交或推送授权；用户随后授权 0.2.0 元数据和规范化改动 commit & push，具体检查见 [testing](../stages/testing.md)。不包含部署或硬件操作。
+
+后续更新：新版 HABITS 的技能索引、阶段资料保留与分支门槛见 [ADR 0003](0003-habits-branch-gates.md)，原文中的旧布局决定仅记录当时事实。

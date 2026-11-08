@@ -82,3 +82,10 @@ def test_claude_bridge_cannot_accumulate_project_rules(documentation):
     result = check(documentation)
     assert result.returncode == 1
     assert "CLAUDE.md must contain only" in result.stdout
+
+
+def test_missing_skill_index_fails(documentation):
+    (documentation / "SKILLS.md").unlink()
+    result = check(documentation)
+    assert result.returncode == 1
+    assert "Missing required file: SKILLS.md" in result.stdout

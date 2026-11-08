@@ -4,7 +4,7 @@ English | [简体中文](CONTRIBUTING.zh-CN.md)
 
 ## Development environment
 
-The root and five children use main; merged long-lived dev branches were removed. Use temporary feature branches when isolation is needed. New browser application code belongs in src/agilex_data_collection and the independent adapters child, preserving legacy controller behavior. See [usage](docs/en/usage.md) and [architecture](docs/en/index.md).
+The root uses stable main, integration dev and dedicated dev-<task> working branches. Do not edit main or dev directly. Child gitlinks remain pinned; prepare child development branches separately when needed. New browser application code belongs in src/agilex_data_collection and the independent adapters child, preserving legacy controller behavior. See [usage](docs/en/usage.md) and [architecture](docs/en/index.md).
 
 uv manages Python 3.12, independent environments and frozen dependencies. GELLO/camera are root editable sources; do not install the SDK hardware stack, LeRobot or PyTorch into the root control environment.
 
@@ -105,3 +105,11 @@ Make sync prepares only root development dependencies, not submodule upgrades/sy
 GitHub CI reuses make sync / make verify. Private children require a repository read-only SUBMODULES_READ_TOKEN because default GITHUB_TOKEN may not span repositories. CI does not install the independent converter dataset environment, so integration skips are explicit; this is not full six-repository acceptance. Local checks do not imply the unpublished workflow ran remotely.
 
 Project-wide licensing is undecided: preserve LICENSE's status rather than inventing license terms. Root/child repositories remain independent; documentation normalization does not automatically propagate to other projects.
+
+## Iteration and acceptance gates
+
+Before each edit, reread the saved target and preserve concurrent user work. Synchronize dev and create dev-<task>. Prepare one patch increment of project.version, a current English description and an unreleased CHANGELOG entry before validation; update locks only through uv. Retries and merges do not increment again.
+
+Run make lint, make test and all change-specific checks, then provide the candidate version, summary, results and physical test instructions in the current conversation. Wait for the user's explicit physical-test pass before any commit, including documentation or checkpoint commits. Silence and software-only passes do not count. After confirmation, commit on the working branch and merge dev. Recheck after conflicts or dev advances; obtain renewed confirmation when physical acceptance is affected.
+
+A dev merge does not publish main, tag or deploy. Future release/hotfix merge and cleanup details remain to be confirmed. The PR template records candidate version, automated evidence, user physical acceptance and risks. The 2026-11-08 policy migration has a one-time user authorization to push main directly; it does not waive later gates.

@@ -1,7 +1,7 @@
 [project]
 name = "agilex-controller"
-version = "0.2.0"
-description = "PiPER-X/GELLO teleoperation and RGB-D data collection through CLI and browser workflows"
+version = "0.2.1"
+description = "CLI and browser workflows for PiPER-X/GELLO teleoperation and RealSense RGB-D datasets"
 readme = "README.md"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 authors = [

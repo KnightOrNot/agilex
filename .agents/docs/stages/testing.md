@@ -1,6 +1,6 @@
 # TESTING：当前测试计划与检查点
 
-更新日期：2026-11-05（Asia/Shanghai）。当前阶段由根 `.ai-stage` 指定。
+更新日期：2026-11-08（Asia/Shanghai）。当前阶段由根 `.ai-stage` 指定。
 
 ## 范围与证据口径
 
@@ -138,3 +138,18 @@ make verify
 - 本节记录提交前已执行的验证，不预填推送或 GitHub CI 成功。最终提交/同步状态以 Git 日志和 origin/main 引用核对；远端 CI 实际运行结果尚未核验。
 
 当前仍为 TESTING，第 5/6 项、Windows 实际图形登录和相机持续吞吐仍按前文待办推进。
+
+
+## 新版 HABITS 迁移检查点（2026-11-08，0.2.1）
+
+用户替换 HABITS 并明确授权本次最后一次直接 commit/push main，后续将保护 main。此范围的一次性例外见 [ADR 0003](../decisions/0003-habits-branch-gates.md)；没有执行或声称通过实物测试，不能据此解除下一轮提交前的用户实测门槛。
+
+- 完成：SKILLS 实际技能索引及 AGENTS 路由；分支/版本/实测确认约定；保留阶段资料与技能产物规则；双语贡献指南及 PR 模板；CI main/dev/dev-* 覆盖；仓库改名后的克隆 URL。
+- 版本：按末段 +1 为 0.2.1，简介重新概括 CLI/浏览器遥操作与 RealSense RGB-D 数据集能力。uv 离线更新 lock 仅改变根版本，无依赖升级。
+- 本轮实际 `make verify`：134 passed（46.97 s），包括三项真实 converter 回读、九项文档检查回归；Ruff、32 文件 format、逐个 Shell 语法、双语示例及本地链接检查通过。
+- `uv lock --check --offline` 通过，`uv build` 生成 0.2.1 sdist/wheel。现有 uv/backend 范围 warning 保留，未压制或变更依赖。
+- CI YAML 本地解析确认开发分支覆盖；未核验本轮远端 Actions 结果。新版 HABITS 原文 SHA-256 为 `f593937162df4db467f3f3696edc2ffa9beffa99de0dd838a8ca46ff5214c953`，用户内容未改动。
+- 交付目标：main 普通推送后，由同一提交初始化本地/远端 dev，结束后停留 dev；不修改五个子模块 gitlink/分支，不修改 GitHub 保护策略，不同步 RON 工作副本。
+- 未验证：本轮不访问设备，不运行第 5/6 项；Windows 实际桌面登录、相机 GUI 与持续吞吐仍保持前文待确认状态。
+
+上述记录是发布前已完成的检查及交付目标；实际推送和分支状态须以 Git 引用核对，不预填成功。后续每次修改在 dev-<任务名> 进行，自动化和用户实测均通过后才能 commit/合并 dev；main 发布流程细节待确认。

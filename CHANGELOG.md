@@ -1,8 +1,24 @@
 # Changelog
 
-All notable changes are recorded here in Keep a Changelog format. This project has no published release yet; version 0.2.0 remains under development.
+All notable changes are recorded here in Keep a Changelog format. This project has no published release yet; version 0.2.1 remains under development.
 
 ## [Unreleased]
+
+
+## 0.2.1 — Unreleased
+
+### Changed
+
+- Adopted the revised HABITS skill index, preserved stage records and artifact-routing conventions.
+- Defined dev integration, isolated working branches and user physical-test acceptance before future commits.
+- Updated contribution/PR guidance, CI branch coverage and clone examples for the renamed agilex repository.
+- Recorded the user's one-time direct-main migration exception without treating it as hardware acceptance.
+
+### Added
+
+- A verified local skill index and documentation checks for its presence.
+
+## 0.2.0 development baseline (not released)
 
 ### Added
 

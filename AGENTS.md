@@ -9,6 +9,7 @@ PiPER-X、GELLO 与 D455F 的遥操作和 RGB-D 数据采集；CLI 与浏览器�
 | --- | --- |
 | 新会话、理解目标与边界 | [.agents/project.md](.agents/project.md) |
 | 开发、命名、依赖、工具、文档 | [.agents/conventions.md](.agents/conventions.md) |
+| 选择技能与加载入口 | [SKILLS.md](SKILLS.md) |
 | 开始工作、验证、收尾、阶段流转、AI 工具 | [.agents/workflows.md](.agents/workflows.md) |
 | 授权、硬件、数据、远端或发布操作 | [.agents/constraints.md](.agents/constraints.md) |
 | 分支、提交、子模块与发布 | [.agents/git.md](.agents/git.md) |

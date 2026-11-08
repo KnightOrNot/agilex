@@ -11,8 +11,8 @@ All projects use Python 3.12; the root and GELLO constrain `>=3.12,<3.13`.
 ## Installer
 
 ```bash
-git clone --branch main git@github.com:KnightOrNot/agilex-controller.git
-cd agilex-controller
+git clone --branch main git@github.com:KnightOrNot/agilex.git
+cd agilex
 ./scripts/setup.sh
 ```
 
@@ -69,7 +69,7 @@ uv run agilex-data-collection setup
 
 All children live under `third-party/`. The camera remote is `git@github.com:KnightOrNot/camera-realsense-d455f.git`, its directory is `camera-submodule-d455f`, and its package/CLI name remains `camera-realsense`. Old console scripts can retain absolute shebangs; recreate environments rather than editing them. Preserve local changes before updating. Optional Menagerie assets remain opt-in.
 
-The Python 3.12/uv baseline is on main; merged long-lived dev branches were removed. Use temporary branches when isolation is needed.
+Install stable main for normal use. Development integrates on dev; make changes on a dedicated dev-<task> branch and follow the contribution gates.
 
 ## Verify installation
 

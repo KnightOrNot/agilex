@@ -24,8 +24,8 @@
 在具备 Git 和所需系统依赖的 Linux 上执行：
 
 ```bash
-git clone --branch main git@github.com:KnightOrNot/agilex-controller.git
-cd agilex-controller
+git clone --branch main git@github.com:KnightOrNot/agilex.git
+cd agilex
 ./scripts/setup.sh
 uv run agilex-data-collection setup
 ```
