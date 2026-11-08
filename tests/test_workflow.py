@@ -11,6 +11,16 @@ import pytest
 from agilex_controller import control, workflow
 
 
+@pytest.fixture
+def project_stub(tmp_path):
+    """Provide interpreter-path validation; these tests never execute the stub."""
+    project = tmp_path / "project"
+    python = project / ".venv/bin/python"
+    python.parent.mkdir(parents=True)
+    python.touch()
+    return project
+
+
 def install_devices(monkeypatch, config, robot_server, *, stop_signal=signal.SIGINT):
     events = []
     config = replace(config, robot=replace(config.robot, port=robot_server["port"]))
@@ -85,10 +95,14 @@ def test_record_save_interrupt_and_safe_shutdown(
 
 
 def test_conversion_occurs_after_hardware_cleanup_and_propagates_failure(
-    monkeypatch, config, robot_server
+    monkeypatch, config, robot_server, project_stub
 ):
     config, events = install_devices(monkeypatch, config, robot_server)
-    config = replace(config, recording=replace(config.recording, convert=True))
+    config = replace(
+        config,
+        recording=replace(config.recording, convert=True),
+        paths=replace(config.paths, converter_project=str(project_stub)),
+    )
 
     def convert(_config, session, _output):
         assert events[-1] == "server-stop"
@@ -214,7 +228,7 @@ def test_unavailable_confirmation_input_does_not_start_hardware(
 
 
 def test_occupied_managed_endpoint_is_refused_before_can_setup(
-    monkeypatch, config, robot_server, tmp_path
+    monkeypatch, config, robot_server, tmp_path, project_stub
 ):
     port_file = tmp_path / "serial"
     port_file.touch()
@@ -222,6 +236,7 @@ def test_occupied_managed_endpoint_is_refused_before_can_setup(
         config,
         robot=replace(config.robot, port=robot_server["port"]),
         gello=replace(config.gello, port=str(port_file)),
+        paths=replace(config.paths, sdk_project=str(project_stub)),
     )
 
     def unexpected(*_args, **_kwargs):
