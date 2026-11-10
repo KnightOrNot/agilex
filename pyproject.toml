@@ -24,7 +24,7 @@ dev = ["pytest>=8.3", "ruff>=0.9"]
 
 [tool.uv.sources]
 agilex-gello-software = { path = "third-party/agilex-gello-software", editable = true }
-camera-realsense = { path = "third-party/camera-submodule-d455f", editable = true }
+camera-realsense = { path = "third-party/camera-realsense-d455f", editable = true }
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

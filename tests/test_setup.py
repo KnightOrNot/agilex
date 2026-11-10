@@ -34,7 +34,7 @@ def installation(tmp_path):
                 "agilex-sdk-python",
                 "agilex-gello-software",
                 "lerobot-converter",
-                "camera-submodule-d455f",
+                "camera-realsense-d455f",
                 "agilex-adapters",
             )
         ),

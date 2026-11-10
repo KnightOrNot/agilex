@@ -4,6 +4,10 @@ All notable changes are recorded here in Keep a Changelog format. This project h
 
 ## [Unreleased]
 
+### Changed
+
+- Renamed the camera submodule checkout to `third-party/camera-realsense-d455f` and synchronized dependency, setup and documentation paths without changing package versions or pinned submodule commits.
+
 ### Fixed
 
 - Made workflow unit tests independent of locally installed SDK and converter environments, so root-only CI can exercise cleanup ordering and occupied-endpoint protection.

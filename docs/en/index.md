@@ -88,6 +88,6 @@ Browser `data/raw/app/` is a separate audit format, paired with direct `data/ler
 | --- | --- | --- |
 | GELLO | [README](../../third-party/agilex-gello-software/README.md) | Not provided |
 | SDK | [README](../../third-party/agilex-sdk-python/README.md) | Not provided |
-| Camera | [README](../../third-party/camera-submodule-d455f/README.md) / [stream API](../../third-party/camera-submodule-d455f/docs/stream.md) | [Guide](../../third-party/camera-submodule-d455f/CONTRIBUTING.md) |
+| Camera | [README](../../third-party/camera-realsense-d455f/README.md) / [stream API](../../third-party/camera-realsense-d455f/docs/stream.md) | [Guide](../../third-party/camera-realsense-d455f/CONTRIBUTING.md) |
 | Converter | [README](../../third-party/lerobot-converter/README.md) / [data flow](../../third-party/lerobot-converter/docs/index.md) | [Guide](../../third-party/lerobot-converter/CONTRIBUTING.md) |
 | Adapters | [README](../../third-party/agilex-adapters/README.md) | Not provided |

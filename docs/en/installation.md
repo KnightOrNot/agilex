@@ -47,7 +47,7 @@ uv python install 3.12
 uv sync --project third-party/agilex-sdk-python --frozen --managed-python --python 3.12
 uv sync --project third-party/agilex-gello-software --frozen --managed-python --python 3.12
 uv sync --project third-party/lerobot-converter --frozen --extra dataset --managed-python --python 3.12
-uv sync --project third-party/camera-submodule-d455f --frozen --managed-python --python 3.12
+uv sync --project third-party/camera-realsense-d455f --frozen --managed-python --python 3.12
 uv sync --frozen --managed-python --python 3.12
 uv sync --project third-party/agilex-adapters --frozen --extra app --managed-python --python 3.12
 mkdir -p data/raw data/lerobot
@@ -67,7 +67,7 @@ git submodule update --init
 uv run agilex-data-collection setup
 ```
 
-All children live under `third-party/`. The camera remote is `git@github.com:KnightOrNot/camera-realsense-d455f.git`, its directory is `camera-submodule-d455f`, and its package/CLI name remains `camera-realsense`. Old console scripts can retain absolute shebangs; recreate environments rather than editing them. Preserve local changes before updating. Optional Menagerie assets remain opt-in.
+All children live under `third-party/`. The camera remote is `git@github.com:KnightOrNot/camera-realsense-d455f.git`, its directory is `camera-realsense-d455f`, and its package/CLI name remains `camera-realsense`. Old console scripts can retain absolute shebangs; recreate environments rather than editing them. Preserve local changes before updating. Optional Menagerie assets remain opt-in.
 
 Install stable main for normal use. Development integrates on dev; make changes on a dedicated dev-<task> branch and follow the contribution gates.
 
@@ -101,10 +101,10 @@ uv run agilex-controller status
 
 ## RealSense permissions
 
-Follow the child [camera installation guide](../../third-party/camera-submodule-d455f/docs/installation.md) for Linux udev rules, then reconnect the device. Setup does not install those rules automatically. Prefer a USB 3 data connection without competing capture programs.
+Follow the child [camera installation guide](../../third-party/camera-realsense-d455f/docs/installation.md) for Linux udev rules, then reconnect the device. Setup does not install those rules automatically. Prefer a USB 3 data connection without competing capture programs.
 
 ```bash
-uv run --project third-party/camera-submodule-d455f camera-realsense info --profiles
+uv run --project third-party/camera-realsense-d455f camera-realsense info --profiles
 ```
 
 Choose supported application profiles in the controller `[camera]` table. A standalone experiment TOML does not replace application configuration. Verify a short saved dataset before long capture. Headless CLI use needs `--no-camera-preview` because wrappers explicitly enable preview, overriding TOML.

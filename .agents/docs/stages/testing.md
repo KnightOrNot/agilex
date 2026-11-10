@@ -166,3 +166,17 @@ make verify
 - 本机完整 make verify：134 passed（54.03 s），包含三项真实 converter 回读；Ruff、Shell 语法和文档检查通过。
 - 改动限于单元测试、英文 CHANGELOG 与本检查点；运行时代码、硬件配置、依赖/版本、子模块 gitlink 和 CI 规则均未改变。未访问硬件，不将软件结果记为实物验收。
 - 交付目标：推送测试修复，等待 PR 的远端 software 成功后通过普通 merge 合入 main，再将同一合并提交快进同步至本地 main/dev 和远端 dev；最终提交与 CI 结果以 PR 和分支引用为准。
+
+
+## 相机子模块目录统一（2026-11-10，版本保持 0.2.1）
+
+用户确认目标名称为 camera-realsense-d455f，并明确要求不增加版本号、直接完成远程 main/dev 同步。本次仅迁移目录与引用，不增加硬件测试或设备访问授权。
+
+- 将 `third-party/camera-submodule-d455f` 通过 git mv 迁移到 `third-party/camera-realsense-d455f`；远程仓库仍为 `git@github.com:KnightOrNot/camera-realsense-d455f.git`，固定提交保持 ba47e2669e1ea5b4ecf2a14f168b1d91d7a5123f。
+- 同步 .gitmodules、根 pyproject 的 editable 路径、安装脚本及其测试夹具、中英文安装/使用/配置链接和项目路由资料。uv lock --offline 只改变锁文件两处相机路径，包版本与依赖解析保持不变；历史变更记录保留当时名称。
+- 旧根/相机环境备份到本地忽略的 `.gstack/venv-backups/camera-path.HV2352/`，以 uv/Python 3.12 frozen lock 重建两个环境。确认根解释器从新路径导入 camera_realsense，活动环境的 editable 元数据无旧路径。
+- 根 make verify：134 passed（45.54 s），包括三项真实 converter 回读；Ruff、Shell 语法、双语文档与链接检查通过。
+- 相机新目录：pyright 为 0 errors、0 warnings；离线 unittest 为 59 passed；CLI --help 通过。未连接或操作物理相机、机械臂。
+- uv lock --check --offline 通过；setup.sh --check-only 首次因本地缺少 data/raw 和 data/lerobot 退出，补齐忽略的数据目录后通过。knight 缺 dialout 组的既有提示保留，未改变系统权限。
+- 子模块源码、其他四个 gitlink、相机 CLI/导入名、设备配置与运行时代码保持不变。既有 uv/build backend 版本范围 warning 保留。
+- 交付目标：工作分支提交后同步 dev，经 PR 的必需 software 检查合入 main，再快进同步本地 main/dev 与远程 dev；不绕过 main 规则。最终 SHA 与远端 CI 结果以 PR/分支核对为准，不将软件验证当作第 5/6 项真机验收。
