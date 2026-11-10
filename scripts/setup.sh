@@ -132,7 +132,7 @@ else
     log "[3/6] 检查 Git submodule"
 fi
 
-for submodule_path in third-party/agilex-sdk-python third-party/agilex-gello-software third-party/lerobot-converter third-party/camera-submodule-d455f third-party/agilex-adapters; do
+for submodule_path in third-party/agilex-sdk-python third-party/agilex-gello-software third-party/lerobot-converter third-party/camera-realsense-d455f third-party/agilex-adapters; do
     [[ -f "$submodule_path/pyproject.toml" ]] \
         || fail "$submodule_path 尚未初始化；请取消 --skip-submodules"
 done
@@ -177,7 +177,7 @@ else
     sync_project third-party/agilex-gello-software
 fi
 sync_project third-party/lerobot-converter --extra dataset
-sync_project third-party/camera-submodule-d455f
+sync_project third-party/camera-realsense-d455f
 sync_project .
 
 log "[5/6] 创建数据目录并验证软件入口"

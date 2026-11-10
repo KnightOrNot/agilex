@@ -115,6 +115,6 @@ raw v1/v2 的关节行包含：
 | --- | --- | --- |
 | GELLO | [README](../../third-party/agilex-gello-software/README.md) | 未提供 |
 | SDK | [README](../../third-party/agilex-sdk-python/README.md) | 未提供 |
-| Camera | [README](../../third-party/camera-submodule-d455f/README.md) / [采集 API](../../third-party/camera-submodule-d455f/docs/stream.md) | [CONTRIBUTING](../../third-party/camera-submodule-d455f/CONTRIBUTING.md) |
+| Camera | [README](../../third-party/camera-realsense-d455f/README.md) / [采集 API](../../third-party/camera-realsense-d455f/docs/stream.md) | [CONTRIBUTING](../../third-party/camera-realsense-d455f/CONTRIBUTING.md) |
 | Converter | [README](../../third-party/lerobot-converter/README.md) / [数据流](../../third-party/lerobot-converter/docs/index.md) | [CONTRIBUTING](../../third-party/lerobot-converter/CONTRIBUTING.md) |
 | Adapters | [README](../../third-party/agilex-adapters/README.md) | 未提供 |

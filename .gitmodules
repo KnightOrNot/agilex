@@ -11,7 +11,7 @@
 	branch = main
 	url = git@github.com:KnightOrNot/lerobot-converter.git
 [submodule "camera-realsense"]
-	path = third-party/camera-submodule-d455f
+	path = third-party/camera-realsense-d455f
 	branch = main
 	url = git@github.com:KnightOrNot/camera-realsense-d455f.git
 [submodule "agilex-adapters"]

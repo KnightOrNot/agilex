@@ -22,4 +22,4 @@ Auto prioritizes 640×360@90, accepting each stream only when measured receipt r
 
 The browser selects camera_mode in `[collection]`, default auto. Slow probes lower rates directly; manual uses configured dimensions/FPS. Explicit legacy controller profiles retain their manual semantics. A 90 FPS camera does not automatically change dataset FPS.
 
-See child [camera configuration](../../../third-party/camera-submodule-d455f/docs/reference/config.md) and application [configuration](config.md). Actual physical throughput requires separate validation.
+See child [camera configuration](../../../third-party/camera-realsense-d455f/docs/reference/config.md) and application [configuration](config.md). Actual physical throughput requires separate validation.

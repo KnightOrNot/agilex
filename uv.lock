@@ -22,7 +22,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "agilex-gello-software", editable = "third-party/agilex-gello-software" },
-    { name = "camera-realsense", editable = "third-party/camera-submodule-d455f" },
+    { name = "camera-realsense", editable = "third-party/camera-realsense-d455f" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "pyzmq", specifier = ">=26.0" },
 ]
@@ -102,7 +102,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/3e/38/7859ff46355f76f8d
 [[package]]
 name = "camera-realsense"
 version = "0.1.0"
-source = { editable = "third-party/camera-submodule-d455f" }
+source = { editable = "third-party/camera-realsense-d455f" }
 dependencies = [
     { name = "numpy" },
     { name = "opencv-python" },

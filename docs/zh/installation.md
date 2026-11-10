@@ -53,7 +53,7 @@ uv python install 3.12
 uv sync --project third-party/agilex-sdk-python --frozen --managed-python --python 3.12
 uv sync --project third-party/agilex-gello-software --frozen --managed-python --python 3.12
 uv sync --project third-party/lerobot-converter --frozen --extra dataset --managed-python --python 3.12
-uv sync --project third-party/camera-submodule-d455f --frozen --managed-python --python 3.12
+uv sync --project third-party/camera-realsense-d455f --frozen --managed-python --python 3.12
 uv sync --frozen --managed-python --python 3.12
 uv sync --project third-party/agilex-adapters --frozen --extra app --managed-python --python 3.12
 mkdir -p data/raw data/lerobot
@@ -79,7 +79,7 @@ uv run agilex-data-collection setup
 
 五个子模块集中在 `third-party/`；相机远程仓库为
 `git@github.com:KnightOrNot/camera-realsense-d455f.git`，本地目录为
-`third-party/camera-submodule-d455f/`，包名/命令仍为 `camera-realsense`。
+`third-party/camera-realsense-d455f/`，包名/命令仍为 `camera-realsense`。
 目录迁移后旧 `.venv` 的入口脚本可能仍指向旧绝对路径。请先将各子模块的
 `.venv` 移到仓库外备份，再运行上述 setup 重建；不要修补旧入口脚本。
 有未提交的子模块修改时先保存工作，再执行更新；普通更新检出主项目固定的提交，
@@ -123,10 +123,10 @@ uv run agilex-controller status
 
 ## RealSense 首次接入
 
-查看[相机安装指南](../../third-party/camera-submodule-d455f/docs/installation.md)配置 Linux udev 权限，重新插拔设备；setup 不会自动安装 udev 规则。推荐 USB 3 数据连接，避免与其他采集程序争用设备。
+查看[相机安装指南](../../third-party/camera-realsense-d455f/docs/installation.md)配置 Linux udev 权限，重新插拔设备；setup 不会自动安装 udev 规则。推荐 USB 3 数据连接，避免与其他采集程序争用设备。
 
 ```bash
-uv run --project third-party/camera-submodule-d455f camera-realsense info --profiles
+uv run --project third-party/camera-realsense-d455f camera-realsense info --profiles
 ```
 
 根据实际 profile 设置 controller 的 `[camera]`，不要用相机库独立实验的 TOML 代替 controller 配置。首次联调按 README 先做只读检查，再启动跟随和短集采集；检查质量报告后再长时间采集。无图形桌面运行包装脚本时加 `--no-camera-preview`，因为脚本参数优先于 TOML。

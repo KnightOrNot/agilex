@@ -49,7 +49,7 @@ Both entries read [config/default.toml](../../config/default.toml). Hardware/saf
 uv run agilex-controller config
 uv run agilex-controller read
 uv run agilex-controller status
-uv run --project third-party/camera-submodule-d455f camera-realsense info --profiles
+uv run --project third-party/camera-realsense-d455f camera-realsense info --profiles
 ```
 
 GELLO read disables torque during initialization and is not strictly read-only. A state-preserving audit uses only Dynamixel PING/READ. SDK status requires CAN readiness; configure the default interface manually when authorized:

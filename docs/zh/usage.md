@@ -25,7 +25,7 @@ RGB-D 预览并直接在网页中浏览、合并、上传或删除 LeRobot 数�
 | `third-party/agilex-adapters/`，Python 3.12 | LeRobot Robot/Teleoperator 协议适配与私有 IPC 客户端 |
 | `third-party/agilex-gello-software/`，Python 3.12 | GELLO/Dynamixel 读取、设备校准、上游通用实验工具 |
 | `third-party/agilex-sdk-python/`，Python 3.12 | CAN 硬件、运动控制、反馈、ZMQ 服务 |
-| `third-party/camera-submodule-d455f/`，Python 3.12 | RGB-D 采集、设备时间戳、深度单位与标定 |
+| `third-party/camera-realsense-d455f/`，Python 3.12 | RGB-D 采集、设备时间戳、深度单位与标定 |
 | `third-party/lerobot-converter/`，Python 3.12 | raw 校验、时间戳重采样、LeRobot 数据集与质量报告 |
 
 ```text
@@ -101,7 +101,7 @@ Python 3.12 环境不会安装这些依赖。
 uv run agilex-controller config
 uv run agilex-controller read
 uv run agilex-controller status
-uv run --project third-party/camera-submodule-d455f camera-realsense info --profiles
+uv run --project third-party/camera-realsense-d455f camera-realsense info --profiles
 ```
 
 `read` 会在 GELLO 驱动初始化时关闭主手扭矩，不是严格只读；需要保持电机状态的

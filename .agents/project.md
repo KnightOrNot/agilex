@@ -20,7 +20,7 @@
 | `config/default.toml` | 唯一应用配置；两个入口共用硬件表，浏览器额外读取 `[collection]` |
 | `third-party/agilex-sdk-python/` | CAN、机械臂控制与反馈、ZMQ 服务 |
 | `third-party/agilex-gello-software/` | GELLO/Dynamixel 读取与设备校准 |
-| `third-party/camera-submodule-d455f/` | RGB-D、时钟映射、深度单位与标定；导入名 `camera_realsense` |
+| `third-party/camera-realsense-d455f/` | RGB-D、时钟映射、深度单位与标定；导入名 `camera_realsense` |
 | `third-party/lerobot-converter/` | legacy raw 校验、时间匹配和 LeRobot 输出 |
 | `third-party/agilex-adapters/` | LeRobot Robot/Teleoperator 协议与 owner-private Unix IPC |
 
