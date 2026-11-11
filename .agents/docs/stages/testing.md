@@ -210,3 +210,10 @@ make verify
 - 本轮改名前完整 make verify 为 170 passed（48.70 s）；改名后契约独立测试 22 passed，Ruff/format、frozen lock 与构建通过，根新导入路径核对通过且旧导入不存在。名称变化不改变消息 schema 或设备行为。
 - 双语指南补齐 dev 克隆、已有工作副本更新和全部子模块初始化；P1 make sync 只准备根仿真环境，真机 CLI/Web 仍需安装指南中的独立 SDK/相机/converter/浏览器环境。
 - 改名后完整 make verify 为 **170 passed（42.13 s）**，无 skip；两个包构建和锁文件一致性检查通过。契约 dev 已推送 3bc6bcf3a108a2477338bb46fabe6ab8536aa817，[独立 GitHub CI](https://github.com/KnightOrNot/agilex-contract/actions/runs/42986900251) 已成功。父仓新克隆验证与远端分支结果在提交后核对；本节记录提交前证据，不预填父仓 CI 或真机成功。
+
+### GitHub 分发后的核验
+
+- 主仓实现提交 dff310dd8cd0fed893ecc99cb87d5404c4aedab1 已通过普通快进推送到 dev，[主仓 GitHub CI](https://github.com/KnightOrNot/agilex/actions/runs/42987308164) 成功；契约 dev 固定为 3bc6bcf3a108a2477338bb46fabe6ab8536aa817，独立 CI 已成功。main 仍为 8bef8fab71b2516d97c82369ec4b155a41a119a2。
+- 在 /tmp/agilex-p1-github.cAmYR3 从 GitHub 获取主仓和六个一级子模块，用全新 .venv 执行 make sync / make verify：**167 passed、3 skipped（7.13 s）**，agx-sim --help 成功，副本工作区干净。三项 skip 是未安装独立 converter 环境的既有集成测试；本机完整环境对应三项已经通过，不把新克隆结果写成 170 全通过或完整真机安装验收。
+- 首次使用递归子模块命令意外开始获取 GELLO 的可选 MuJoCo Menagerie。已停止本轮临时克隆的下载，取消该可选初始化并恢复中断的一级检出后完成以上验证。双语指南修正为 git clone 后 git submodule update --init，不使用 --recursive 下载可选资源；原工作区和采集数据未受影响。
+- 收尾文档检查与九项文档回归通过；后续仅提交该拉取说明和本记录，版本保持 0.2.2。GitHub CI 与新副本证据只代表软件分发可用，P0、第 5/6 项、PiPER-X 断令行为及真机验收仍按前文待办推进。

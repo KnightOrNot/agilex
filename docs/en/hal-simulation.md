@@ -6,13 +6,14 @@ P1 provides the independent `agilex-contract` package and synthetic Leader, Foll
 
 ## Working copy and installation
 
-`third-party/agilex-contract` is an independent Git submodule pinned to an exact commit and referenced through a uv local path. Initialize all submodules when obtaining the test candidate. The original five submodule commits are unchanged. Root version 0.2.2 and contract version 0.1.0 are dev snapshots awaiting physical-device acceptance.
+`third-party/agilex-contract` is an independent Git submodule pinned to an exact commit and referenced through a uv local path. Initialize the six top-level submodules when obtaining the test candidate. The original five submodule commits are unchanged. Root version 0.2.2 and contract version 0.1.0 are dev snapshots awaiting physical-device acceptance.
 
 To obtain the test candidate on another computer:
 
 ```bash
-git clone --branch dev --recurse-submodules git@github.com:KnightOrNot/agilex.git
+git clone --branch dev git@github.com:KnightOrNot/agilex.git
 cd agilex
+git submodule update --init
 make sync
 uv run --frozen agx-sim --help
 make verify
@@ -24,11 +25,11 @@ For an existing checkout, preserve local changes first, then update:
 git switch dev
 git pull --ff-only origin dev
 git submodule sync --recursive
-git submodule update --init --recursive
+git submodule update --init
 make sync
 ```
 
-These steps prepare the root environment and P1 simulation. Before using the existing physical-device CLI/Web workflows, follow the [installation guide](installation.md) to synchronize the separate SDK, GELLO, camera, converter and browser environments. Preserve the test computer's device configuration and calibration. `agx-sim` does not control physical devices.
+These steps prepare the root environment and P1 simulation. Initialize without `--recursive` to avoid downloading GELLO's optional MuJoCo Menagerie assets; explicitly enable them through the installation guide when needed. Before using the existing physical-device CLI/Web workflows, follow the [installation guide](installation.md) to synchronize the separate SDK, GELLO, camera, converter and browser environments. Preserve the test computer's device configuration and calibration. `agx-sim` does not control physical devices.
 
 `make verify` includes contract tests, simulated authority tests, real child-process IPC and existing regression tests. No physical devices are accessed. The OS must permit local test sockets; sandbox bind failures do not indicate a hardware fault.
 

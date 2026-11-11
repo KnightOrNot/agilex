@@ -6,13 +6,14 @@ P1 提供独立 `agilex-contract` 包，以及 Leader、Follower、RGB-D 相机�
 
 ## 工作副本与安装
 
-`third-party/agilex-contract` 是独立 Git 子模块，父仓固定其提交，并通过 uv 本地路径引用。获取待测版本时必须初始化所有子模块；原五个子模块保持原提交。根版本 0.2.2 与契约版本 0.1.0 是 dev 待测快照，真机验收仍待完成。
+`third-party/agilex-contract` 是独立 Git 子模块，父仓固定其提交，并通过 uv 本地路径引用。获取待测版本时必须初始化六个一级子模块；原五个子模块保持原提交。根版本 0.2.2 与契约版本 0.1.0 是 dev 待测快照，真机验收仍待完成。
 
 在另一台计算机首次获取待测版：
 
 ```bash
-git clone --branch dev --recurse-submodules git@github.com:KnightOrNot/agilex.git
+git clone --branch dev git@github.com:KnightOrNot/agilex.git
 cd agilex
+git submodule update --init
 make sync
 uv run --frozen agx-sim --help
 make verify
@@ -24,11 +25,11 @@ make verify
 git switch dev
 git pull --ff-only origin dev
 git submodule sync --recursive
-git submodule update --init --recursive
+git submodule update --init
 make sync
 ```
 
-以上只准备根环境和 P1 仿真。实验机运行已有真机 CLI/Web 前，还需按[安装指南](installation.md)同步 SDK、GELLO、相机、converter 和浏览器的独立环境，并保留该机器的设备配置与标定。`agx-sim` 不控制真实设备。
+以上只准备根环境和 P1 仿真。初始化不用 `--recursive`，避免额外下载 GELLO 的可选 MuJoCo Menagerie 资源；需要这些资源时按安装指南显式启用。实验机运行已有真机 CLI/Web 前，还需按[安装指南](installation.md)同步 SDK、GELLO、相机、converter 和浏览器的独立环境，并保留该机器的设备配置与标定。`agx-sim` 不控制真实设备。
 
 `make verify` 包含契约测试、仿真权限测试、真实子进程 IPC 和原有回归测试。均不访问物理设备。操作系统必须允许本机测试 socket；受限沙箱的绑定失败不能视为硬件问题。
 
