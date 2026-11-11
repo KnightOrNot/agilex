@@ -1,8 +1,17 @@
 # Changelog
 
-All notable changes are recorded here in Keep a Changelog format. This project has no published release yet; version 0.2.1 remains under development.
+All notable changes are recorded here in Keep a Changelog format. Version 0.2.2 is a dev test candidate awaiting physical-device acceptance, not a stable release.
 
-## [Unreleased]
+## 0.2.2 — Development candidate
+
+### Added
+
+- Started architecture P1 with an independent `agilex-contract` submodule, validated typed samples/commands and explicit episode boundary fields, pinned for reproducible checkouts on the test computer.
+- Added the hardware-free `agx-sim` CLI with leader, follower, RGB-D camera and force/torque devices over private local IPC, multipart image transport and independent command/lease watchdogs.
+- Added contract, control-authority and child-process IPC tests, including two cameras and a force sensor, plus bilingual simulation documentation.
+- Documented dev checkout/update steps and the user-authorized test-before-hardware-acceptance distribution exception.
+
+## Earlier unreleased maintenance
 
 ### Changed
 

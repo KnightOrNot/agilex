@@ -22,7 +22,7 @@
 
 ## 子模块、提交与发布
 
-- 普通初始化：`git submodule sync --recursive`，然后 `git submodule update --init`，检出父仓固定提交；只有明确升级才使用 `--remote --merge`。五个 `.gitmodules` 的远程升级分支均为 `main`。
+- 普通初始化：`git submodule sync --recursive`，然后 `git submodule update --init`，检出父仓固定提交；只有明确升级才使用 `--remote --merge`。原五个子模块的远程升级分支为 `main`；新增 `agilex-contract` 待测快照跟踪 `dev`，普通初始化仍检出父仓固定的 gitlink。
 - 移动子模块后备份并重建 `.venv`，不修补绝对 shebang。父项目、子模块和相邻独立工作副本互不自动同步。
 - 一次提交一项可验证变更；用简洁英文祈使句及 conventional prefix，说明内容与原因。行为、必要测试与对应文档组成同一个可审阅变更。
 - 发布顺序：子模块测试 → 授权提交并推送子模块 → 更新父 gitlink → 验证父项目 → 授权发布父仓。不得发布远端无法取得的 gitlink。
@@ -31,3 +31,10 @@
 - `.gitignore` 分类维护，忽略 `.venv`、缓存、构建、本地环境/凭据和数据；共享 `.agents/`、规范索引、钩子与工作流进入版本控制。
 
 历史与当前基线证据见 [ADR](docs/decisions/0001-baseline-and-validation.md) 和 [testing](docs/stages/testing.md)。
+
+
+## P1 待测版异机分发例外（2026-11-11）
+
+用户明确说明真机实验在另一台计算机进行，需要从 GitHub 拉取，因此授权本次 0.2.2 待测版在真机验收前提交、合入并推送 dev。用户还指定独立契约仓库使用 git@github.com:KnightOrNot/agilex-contract.git，并要求本地包名、导入名和目录统一改名。
+
+本次按契约子仓 dev 先发布、父仓固定 gitlink 并验证、主仓工作分支提交后快进 dev 的顺序执行。原五个子模块固定提交不变；不更新任何已有 main，不打发布标签，不代替用户作出真机通过结论。这是本次分发例外，不永久修改 HABITS 或其他迭代的默认实测门槛。

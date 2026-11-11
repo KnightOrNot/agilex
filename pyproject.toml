@@ -1,7 +1,7 @@
 [project]
 name = "agilex-controller"
-version = "0.2.1"
-description = "CLI and browser workflows for PiPER-X/GELLO teleoperation and RealSense RGB-D datasets"
+version = "0.2.2"
+description = "CLI and browser RGB-D collection with typed HAL contracts and hardware-free device simulation"
 readme = "README.md"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 authors = [
@@ -9,20 +9,24 @@ authors = [
 ]
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "agilex-contract",
     "agilex-gello-software",
     "camera-realsense",
     "numpy>=1.26",
+    "msgpack>=1.1",
     "pyzmq>=26.0",
 ]
 
 [project.scripts]
 agilex-controller = "agilex_controller.cli:main"
 agilex-data-collection = "agilex_data_collection:main"
+agx-sim = "agx_sim.__main__:main"
 
 [dependency-groups]
 dev = ["pytest>=8.3", "ruff>=0.9"]
 
 [tool.uv.sources]
+agilex-contract = { path = "third-party/agilex-contract", editable = true }
 agilex-gello-software = { path = "third-party/agilex-gello-software", editable = true }
 camera-realsense = { path = "third-party/camera-realsense-d455f", editable = true }
 
@@ -42,4 +46,4 @@ requires = ["uv_build>=0.12.7,<0.13.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-module-name = ["agilex_controller", "agilex_data_collection"]
+module-name = ["agilex_controller", "agilex_data_collection", "agx_sim"]

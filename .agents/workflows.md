@@ -15,8 +15,8 @@
 | 命令 | 真实行为 |
 | --- | --- |
 | `make sync` | uv 按 frozen lock 同步根开发环境；不更新 gitlink，不配置系统或硬件 |
-| `make lint` | 根 Ruff lint/format 检查，逐个检查 Shell 语法 |
-| `make test` | 根 pytest，包含已有 converter 环境时的真实集成回读；缺失环境的 skip 由 pytest 明示 |
+| `make lint` | 根代码与本地 agilex-contract 的 Ruff lint/format 检查，逐个检查 Shell 语法 |
+| `make test` | 根与 agilex-contract 的 pytest，包含仿真 HAL/IPC 与已有 converter 环境时的真实集成回读；缺失环境的 skip 由 pytest 明示 |
 | `make docs` | 检查基础文件、AI 路由、双语路径/语言链接、相对链接/锚点与双语命令/配置示例一致性；不访问网络 |
 | `make verify` | 汇总 lint、docs、test；任何失败均返回非零，不以占位命令代替检查 |
 

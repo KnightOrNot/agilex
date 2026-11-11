@@ -8,6 +8,7 @@
 - [安装](installation.md)与[用法](usage.md)
 - [CLI](reference/cli.md)、[配置](reference/config.md)与[子模块配置](reference/submodule-config.md)
 - [相机与同步](cameras.md)、[故障排查](reference/errors.md)
+- [HAL 契约与无硬件仿真（P1）](hal-simulation.md)
 - [项目首页](../../README.zh-CN.md)与[贡献指南](../../CONTRIBUTING.zh-CN.md)
 
 项目有两个并列入口，共用设备配置、硬件互斥锁和底层客户端：命令行 controller

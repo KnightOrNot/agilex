@@ -18,7 +18,7 @@
 ## 工程与工具
 
 - 使用 uv、`src/<package>/` 布局；包、依赖、工具和入口集中在 `pyproject.toml`。锁文件仅由 uv 维护，Python 与本地/CI 保持兼容，`.venv/` 只在本地生成。
-- 根 Ruff 配置在 `pyproject.toml`，检查 `src`、`tests` 与文档检查脚本；pytest 路径和 integration marker 也在该文件。
+- 根 Ruff 配置在 `pyproject.toml`，检查 `src`、`tests`、文档检查脚本及本地 `third-party/agilex-contract`；pytest 路径和 integration marker 也在该文件。
 - 根项目未配置 mypy，不报告其通过；已有 SDK/camera 的 Pyright 继续由各自配置维护。本轮不额外引入类型检查依赖。
 - 根 `make lint`、`make test`、`make docs` 与 `make verify` 是统一检查入口；具体命令与验证范围见 [workflows.md](workflows.md)。
 

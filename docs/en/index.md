@@ -9,6 +9,7 @@ The CLI controller and browser collection app are parallel entry points sharing 
 - [Installation](installation.md) and [usage](usage.md)
 - [CLI](reference/cli.md), [configuration](reference/config.md) and [submodule configuration](reference/submodule-config.md)
 - [RGB-D and timing](cameras.md), [troubleshooting](reference/errors.md)
+- [HAL contracts and hardware-free simulation (P1)](hal-simulation.md)
 - [Project home](../../README.md) and [contributing](../../CONTRIBUTING.md)
 
 ## Ownership

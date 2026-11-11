@@ -180,3 +180,33 @@ make verify
 - uv lock --check --offline 通过；setup.sh --check-only 首次因本地缺少 data/raw 和 data/lerobot 退出，补齐忽略的数据目录后通过。knight 缺 dialout 组的既有提示保留，未改变系统权限。
 - 子模块源码、其他四个 gitlink、相机 CLI/导入名、设备配置与运行时代码保持不变。既有 uv/build backend 版本范围 warning 保留。
 - 交付目标：工作分支提交后同步 dev，经 PR 的必需 software 检查合入 main，再快进同步本地 main/dev 与远程 dev；不绕过 main 规则。最终 SHA 与远端 CI 结果以 PR/分支核对为准，不将软件验证当作第 5/6 项真机验收。
+
+
+## 架构 P1：契约与扩展仿真（2026-11-11，0.2.2 待测）
+
+用户授权清理无用 dev 分支并按架构文档开始实现。本轮按 [ADR 0004](../decisions/0004-hal-service-architecture.md) 与 [P1 计划](../specs/architecture-p1-plan.md) 实施，仅为软件/仿真证据，P0 真机基线及第 5/6 项仍未完成。
+
+- 分支：确认三个旧本地分支相对 dev 没有独有提交后，用普通删除移除 dev-camera-path、dev-ci-isolation、dev-gitignore。当前工作分支改名为 dev-architecture-p1；main/dev、远端引用和原五个 gitlink 未改。
+- 实现：独立 agilex-contract 包提供设备/流描述、类型载荷、时间与来源、命令/确认、episode 边界与严格 wire 校验；根 agx-sim 提供 leader/follower/camera/wrench 的独立进程、私有 IPC、租约/权限/对齐状态、非阻塞命令及本地看门狗。两台相机、假六维力和非六轴 follower 均有测试。
+- 迁移范围：旧 CLI/Web 真机路径保留，未连接 CAN、串口或物理相机。新 runtime、录制、raw v3 文件布局/回放及真实 HAL 归后续 P2/P3+；不能把边界类型存在视为录制完成。
+- 仓库限制：third-party/agilex-contract 已初始化为独立本地 Git 仓库，但没有首次提交、远端或父 gitlink。当前工作副本可运行，单独克隆父仓尚无法获得新依赖；提交门槛满足后按子仓发布→父仓 gitlink→完整新克隆验证推进。
+- 依赖：uv 仅更新根版本 0.2.1→0.2.2，并新增 agilex-contract 0.1.0 与 msgpack 1.2.4，根既有依赖版本不变。两个包的 sdist/wheel 构建成功；原 uv/backend 范围 warning 仍存在。契约包有独立开发工具声明与 uv 锁，不以父仓测试环境替代独立安装入口。
+- 基线：受限沙箱先在既有 ZMQ bind 测试中中止；允许本机测试 socket 后 make verify 为 134 passed。这是沙箱权限问题，没有改动或跳过旧测试。
+- 首轮集成：165 passed、1 failed。新测试错误地假定异步 PUSH 已连接；改为在激活前等待可写，并用样本确认 PUB 订阅已就绪，生产代码 send() 仍保持非阻塞且可返回 False。
+- 独立评审确认三项重要问题：深层嵌套消息可触发递归崩溃、批次积压提交中间旧目标、固定 5ms 等待无法支持声明的高频采样。三项均补测试先复现失败，再修复为深度上限、积压时延后提交及按采样期限轮询；真实 IPC 坏消息在两个通道上均被拒绝且后续握手正常。
+- 最终完整 make verify：**170 passed（38.58 s）**，含原 134 项、契约 22 项、控制 7 项、真实子进程 IPC 5 项和服务循环 2 项；Ruff、format、Shell 语法及双语文档检查通过，没有 skip。契约 stdlib-only 导入通过；wheel 核对包含新模块，版本分别为 0.2.2/0.1.0。
+- 收尾独立验证：契约仓库用自己的 frozen uv 环境运行 22 项测试、Ruff 与 format 全部通过，sdist/wheel 重新构建成功。补充 dev 工具后用 uv 同步父锁的 requires-dev 元数据；根既有依赖版本不变，两个 uv lock --check --offline 与根 frozen sync 均通过。文档/计划补全后 make lint docs 与 git diff --check 再次通过。
+- 没有提交、合并、推送或远端 CI 结论；HABITS SHA-256 仍为 f593937162df4db467f3f3696edc2ffa9beffa99de0dd838a8ca46ff5214c953。执行账本及完整测试输出保留于本地忽略目录 .superpowers/sdd/architecture-p1-plan/，不会将其当作已提交历史。
+
+操作说明见 [仿真指南](../../../docs/zh/hal-simulation.md)。请用户在当前工作副本按指南启动/查询/读取合成相机并退出，确认本轮待测结果；该步骤不要求运行真机。项目提交前仍遵循 git.md 的用户确认门槛，P0 运动和短采集验收需要原有现场授权及证据。
+
+
+## P1 dev 异机分发与契约改名（2026-11-11）
+
+用户在上一检查点后明确授权先提交待测版本到 dev 并推送 GitHub，供另一台真机实验计算机拉取。此次例外见 [git.md](../../git.md)；不将其记为硬件验收通过，不更新 main 或发布标签。
+
+- 用户指定契约仓库为 git@github.com:KnightOrNot/agilex-contract.git；目录/包名/uv source 为 agilex-contract，Python 导入为 agilex_contract。根版本仍为本次迭代 0.2.2，契约版本仍为首次开发快照 0.1.0。
+- 契约仓库首次提交及其改名提交位于 dev，父仓通过第六个子模块固定它。原五个 gitlink 不变。旧契约环境与构建产物备份在本地忽略的 .gstack/venv-backups/ 下，以 uv 重建新路径环境；不改旧 shebang，不把缓存、备份、环境或数据加入 Git。
+- 本轮改名前完整 make verify 为 170 passed（48.70 s）；改名后契约独立测试 22 passed，Ruff/format、frozen lock 与构建通过，根新导入路径核对通过且旧导入不存在。名称变化不改变消息 schema 或设备行为。
+- 双语指南补齐 dev 克隆、已有工作副本更新和全部子模块初始化；P1 make sync 只准备根仿真环境，真机 CLI/Web 仍需安装指南中的独立 SDK/相机/converter/浏览器环境。
+- 改名后完整 make verify 为 **170 passed（42.13 s）**，无 skip；两个包构建和锁文件一致性检查通过。契约 dev 已推送 3bc6bcf3a108a2477338bb46fabe6ab8536aa817，[独立 GitHub CI](https://github.com/KnightOrNot/agilex-contract/actions/runs/42986900251) 已成功。父仓新克隆验证与远端分支结果在提交后核对；本节记录提交前证据，不预填父仓 CI 或真机成功。

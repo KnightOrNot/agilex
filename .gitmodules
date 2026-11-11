@@ -18,3 +18,7 @@
 	path = third-party/agilex-adapters
 	branch = main
 	url = git@github.com:KnightOrNot/agilex-adapters.git
+[submodule "agilex-contract"]
+	path = third-party/agilex-contract
+	url = git@github.com:KnightOrNot/agilex-contract.git
+	branch = dev

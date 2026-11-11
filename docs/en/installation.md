@@ -16,7 +16,7 @@ cd agilex
 ./scripts/setup.sh
 ```
 
-The script resolves its own project root, initializes the five pinned children, installs Python through uv and synchronizes separate frozen environments. It installs Ubuntu packages, uv when needed and the serial group membership. It does not open CAN/serial or send motion. Current GELLO uses PyPI DynamixelSDK 4.0.5; the installer also supports historical nested-SDK layouts.
+The script resolves its own project root, initializes the pinned children, installs Python through uv and synchronizes separate frozen environments. The dev test candidate adds `agilex-contract` as a sixth child, installed into the root environment as a pure library. See the [HAL simulation guide](hal-simulation.md) for obtaining dev on another computer. The script installs Ubuntu packages, uv when needed and the serial group membership. It does not open CAN/serial or send motion. Current GELLO uses PyPI DynamixelSDK 4.0.5; the installer also supports historical nested-SDK layouts.
 
 Install the separate browser application before its first use:
 
@@ -55,7 +55,7 @@ mkdir -p data/raw data/lerobot
 
 The adapters `app` extra includes LeRobot, LeLab, FastAPI and uvicorn. It is separate from the controller. GELLO and camera are root editable sources; an independent child CLI uses its own environment. Do not combine environments through PYTHONPATH.
 
-Use the `agilex_gello_software` namespace and pinned DynamixelSDK 4.0.5. For ordinary updates, use pinned gitlinks. Explicit upgrades use `git submodule update --init --remote` and require testing before committing new references; `.gitmodules` follows main.
+Use the `agilex_gello_software` namespace and pinned DynamixelSDK 4.0.5. For ordinary updates, use pinned gitlinks. Explicit upgrades use `git submodule update --init --remote` and require testing before committing new references; the original five children track main, while the new contract candidate tracks dev. Ordinary initialization always checks out the pinned commit.
 
 Before moving checkouts, back up old child `.venv` directories outside the repository and recreate them at the new paths:
 
