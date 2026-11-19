@@ -1,0 +1,107 @@
+# Copy to config/runtime-hardware.local.toml; review all hardware-specific values.
+# Nothing is opened by loading this file. Running it prepares real devices.
+[runtime]
+leader = "leader"
+follower = "arm"
+control_hz = 50.0
+startup_timeout_s = 30.0
+lease_timeout_s = 30.0
+rpc_timeout_s = 0.2
+ack_timeout_s = 0.25
+command_timeout_s = 0.25
+
+[record]
+mode = "full"
+dataset_fps = 30
+max_skew_ms = 50.0
+capture_fps_max = 90.0
+boundary_timeout_s = 1.0
+drain_timeout_s = 5.0
+
+[motion]
+position_tolerance_deg = 1.5
+
+[mapping]
+joint_1 = ["joint_1", 1.0]
+joint_2 = ["joint_2", 1.0]
+joint_3 = ["joint_3", -1.0]
+joint_4 = ["joint_4", -1.0]
+joint_5 = ["joint_5", 1.0]
+joint_6 = ["joint_6", 1.0]
+
+[[devices]]
+device_id = "leader"
+kind = "leader"
+backend = "gello"
+python = "../third-party/agilex-gello-software/.venv/bin/python"
+hz = 50.0
+[devices.settings]
+port = "/dev/serial/by-id/REPLACE_WITH_GELLO"
+joint_ids = [1, 2, 3, 4, 5, 6]
+# Installation calibration: copy verified values; do not calibrate automatically.
+joint_offsets = [3.141592653589793, 3.141592653589793, 3.141592653589793, 3.141592653589793, 3.141592653589793, 3.141592653589793]
+joint_signs = [1, -1, -1, -1, 1, 1]
+gripper_config = [7, 159, 201]
+gripper_max_width_m = 0.1
+
+[[devices]]
+device_id = "arm"
+kind = "follower"
+backend = "piperx"
+python = "../third-party/agilex-sdk-python/.venv/bin/python"
+exit_policy = "piperx_return_zero"
+[devices.settings]
+channel = "can0"
+interface = "socketcan"
+feedback_timeout_s = 0.5
+gripper_max_width_m = 0.1
+gripper_force_n = 1.0
+max_command_step_rad = 1.0
+configure_motion_limits = true
+
+[[devices]]
+device_id = "front"
+kind = "camera"
+backend = "realsense"
+python = "../third-party/camera-realsense-d455f/.venv/bin/python"
+[devices.settings]
+serial = "REPLACE_WITH_CAMERA_SERIAL"
+mode = "auto"
+width = 640
+height = 360
+fps = 90
+depth_width = 640
+depth_height = 360
+depth_fps = 90
+warmup_frames = 15
+
+[[streams]]
+device_id = "leader"
+stream = "joints"
+role = "control_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+[[streams]]
+device_id = "leader"
+stream = "gripper"
+role = "control_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+[[streams]]
+device_id = "arm"
+stream = "joints"
+role = "control_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+[[streams]]
+device_id = "arm"
+stream = "gripper"
+role = "control_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+[[streams]]
+device_id = "front"
+stream = "rgb"
+role = "record_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+[[streams]]
+device_id = "front"
+stream = "depth"
+role = "record_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]

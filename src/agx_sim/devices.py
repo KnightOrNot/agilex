@@ -15,13 +15,23 @@ from agilex_contract import (
     WrenchSample,
 )
 
+from agx_hal.streams import EpisodeCounters
 
-class SimDevice:
+
+class SimDevice(EpisodeCounters):
     def __init__(
-        self, kind: str, device_id: str, *, axes: int = 6, hz: float | None = None
+        self,
+        kind: str,
+        device_id: str,
+        *,
+        axes: int = 6,
+        hz: float | None = None,
+        exit_policy: str = "stop_simulated_targets",
     ):
         if kind not in ("leader", "follower", "camera", "wrench"):
             raise ValueError("unsupported simulated device kind")
+        if exit_policy not in ("stop_simulated_targets", "simulated_zero"):
+            raise ValueError("unsupported simulated exit policy")
         if type(axes) is not int or not 1 <= axes <= 32:
             raise ValueError("axes must be between 1 and 32")
         self.kind = kind
@@ -42,6 +52,7 @@ class SimDevice:
         self.epoch = uuid.uuid4().hex
         self._seq = {}
         self._cached = {}
+        self._init_counters()
         if kind in ("leader", "follower"):
             streams = (
                 StreamSpec("joints", "joint", names, "rad", self.hz, stale_ns),
@@ -80,7 +91,7 @@ class SimDevice:
             ((-math.pi, math.pi),) * axes if kind == "follower" else (),
             (0.0, 0.08) if kind == "follower" else None,
             ("start_synthetic_streams",),
-            "stop_simulated_targets",
+            exit_policy,
             "simulated",
         )
 
@@ -140,6 +151,7 @@ class SimDevice:
             result.append(sample)
             self._cached[spec.name] = sample
             self._seq[spec.name] = seq + 1
+            self.track(sample)
         return result
 
     def cached(self, stream: str, now_ns: int) -> Sample:

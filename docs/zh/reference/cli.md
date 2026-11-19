@@ -12,6 +12,8 @@ uv run agilex-controller [--project-root PATH] [--config FILE] COMMAND [OPTIONS]
 
 ## 命令
 
+P2 的 `agx-runtime run/serve/request/check/replay` 只连接仿真 HAL。命令、会话确认、raw v3 检查与回放示例见 [统一 runtime 仿真指南](../runtime-simulation.md)。
+
 | 命令 | 行为 |
 | --- | --- |
 | `config` | 输出有效配置 JSON |
@@ -77,7 +79,7 @@ R 开始、S 保存、D 丢弃、P 状态、H 帮助。非终端输入不提供�
 uv run agilex-controller movejs --joints 0 0 0 0 0 0 --gripper 0.5
 ```
 
-要求 SDK 服务已在运行。支持 host/port 的两组别名、`--request-timeout-s`、`--joints`（6 个 rad，默认全零）、`--gripper`（0..1，默认保留当前反馈）、`--step-rad`（0.02）、`--period`（0.02 s）、`--tolerance-deg`（1.0）。达到目标后根据反馈验收，失败时报错。
+要求 SDK 服务已在运行。支持 host/port 的两组别名、`--request-timeout-s`、`--joints`（6 个 rad，默认全零）、`--gripper`（0..1，默认保留当前反馈）、`--step-rad`（0.02）、`--period`（0.02 s）、`--tolerance-deg`（1.5）。达到目标后根据反馈验收，失败时报错。
 
 此命令直接定位，不创建 SDK 服务；它不包含托管跟随的确认和退出回零流程。
 

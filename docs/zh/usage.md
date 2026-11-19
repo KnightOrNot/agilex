@@ -218,10 +218,11 @@ uv run agilex-data-collection serve --simulate
 
 ### JS 回零与定位误差
 
-`[collection].position_tolerance_deg = 1.1` 用于启动回零、GELLO 对齐和退出
-回零的每轴到位校验，沿用原定位函数的 5 秒最终目标等待；超差即停止，不跳过
-验收，也不修改实际关节反馈。用户在 2026-10-20 的 J3 定位调查后明确授权将
-容差从 1.0° 调整为 **1.1°**。CLI 的 `move_js` 默认仍为 1.0°，不读取该 collection 配置。
+CLI、Web 和新 runtime 的启动回零、GELLO 对齐及退出回零统一采用 **1.5°** 的
+每轴到位基线。浏览器使用 `[collection].position_tolerance_deg = 1.5`，runtime
+使用 `motion.position_tolerance_deg`，CLI `movejs` 可用 `--tolerance-deg` 显式覆盖。
+用户于 2026-11-17 确认该基线并决定不再补做容差实验；P0 原有 1.0°/1.1° 判据及
+实测残差保持原样。沿用原定位函数的 5 秒最终目标等待，超差即停止，不修改实际关节反馈。
 
 日志中的 `[position]` / `[position_result]` 标明 `startup_zero`、
 `gello_alignment` 或 `exit_zero`，记录六轴目标、起止反馈、有符号残差、
@@ -330,7 +331,7 @@ uv run agilex-controller convert data/raw/SESSION data/lerobot/DATASET
 | `POST /api/start ... 409 Conflict` | 查看网页提示；未确认、任务为空或会话未结束时后端会拒绝 |
 | 8000 端口被占用 | 停止旧服务，或 `serve --port 8001` 后打开对应端口 |
 | 提示 `CAN interface can0 is DOWN` | 执行 `./third-party/agilex-sdk-python/scripts/config_can.sh` 后重试 |
-| `startup_zero` / `exit_zero`、`JS positioning failed` | 浏览器容差为 1.1°（CLI 默认 1.0°）；查看日志 `[position_result]` 的六轴反馈与残差，不跳过校验 |
+| `startup_zero` / `exit_zero`、`JS positioning failed` | CLI、浏览器和 runtime 默认每轴到位容差均为 1.5°；查看日志 `[position_result]` 的六轴反馈与残差，不跳过校验 |
 | 相机快速模式不稳定 | 把 `[collection].camera_mode` 改为 `"slow"`，停止会话后重启 |
 | 深度或点云预览不可用 | 确认 `depth_enabled = true` 且已进入 `following`；点云要求无畸变 rectified 深度标定 |
 | 点云不显示或拖动无响应 | 启用浏览器 WebGL 并刷新；预览最多两个连接，关闭多余标签页 |

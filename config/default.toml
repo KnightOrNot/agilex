@@ -68,7 +68,7 @@ max_skew_ms = 50.0
 queue_size = 90
 watchdog_s = 1.0
 # Per-joint JS arrival tolerance for startup zero/alignment and exit zero.
-position_tolerance_deg = 1.1
+position_tolerance_deg = 1.5
 # Display only: colorized depth range and point-cloud decimation.
 preview_depth_max_m = 3.0
 preview_cloud_stride = 4
@@ -76,3 +76,32 @@ camera_enabled = true
 # auto prefers measured 640x360@90; slow skips fast modes; manual uses [camera].
 camera_mode = "auto"
 depth_enabled = true
+
+# P2 simulation runtime. Legacy CLI/Web continue to use their existing tables.
+[runtime]
+control_hz = 50.0
+startup_timeout_s = 5.0
+rpc_timeout_s = 0.2
+ack_timeout_s = 0.25
+command_timeout_s = 0.25
+lease_timeout_s = 3.0
+watchdog_s = 1.0
+data_root = "data/raw-v3"
+lock_path = "/tmp/start_gello_follow.lock"
+
+[record]
+mode = "full"
+dataset_fps = 30
+max_skew_ms = 50.0
+capture_fps_max = 90.0
+queue_size = 512
+# Bounded simulation defaults; review with P0 measurements and P4 hardware data.
+boundary_timeout_s = 1.0
+drain_timeout_s = 5.0
+
+[motion]
+position_tolerance_deg = 1.5
+max_start_error_rad = 0.35
+transition_step_rad = 0.02
+max_command_step_rad = 1.0
+alignment_timeout_s = 10.0

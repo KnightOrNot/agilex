@@ -1,12 +1,13 @@
 """Exercise the real service loop with a deterministic clock and socket queues."""
 
+import threading
 from collections import deque
 from statistics import median
 
 import zmq
 from agilex_contract import Ack, Command, Sample, to_wire
 
-from agx_sim import server
+from agx_hal import server
 from agx_sim.control import ControlGate
 from agx_sim.devices import SimDevice
 from agx_sim.transport import pack
@@ -33,7 +34,8 @@ def loop_fixture(monkeypatch, kind, hz, turns):
     service.stopping = False
     service.protocol_errors = 0
     service._publish = events.append
-    service.close = lambda: None
+    service._watch_stop = threading.Event()
+    service.close = service._watch_stop.set
     lease = service.gate.acquire("session", now[0])
     service.gate.prepare("session", lease, now[0])
 

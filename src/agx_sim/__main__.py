@@ -30,6 +30,11 @@ def main(argv=None):
     serve.add_argument("--endpoint-dir", required=True)
     serve.add_argument("--axes", type=int, default=6)
     serve.add_argument("--hz", type=_positive)
+    serve.add_argument(
+        "--exit-policy",
+        choices=("stop_simulated_targets", "simulated_zero"),
+        default="stop_simulated_targets",
+    )
     serve.add_argument("--command-timeout-s", type=_positive, default=0.25)
     serve.add_argument("--lease-timeout-s", type=_positive, default=5.0)
     inspect = sub.add_parser(
@@ -42,7 +47,13 @@ def main(argv=None):
             with HalClient(args.endpoint_dir) as client:
                 print(json.dumps(to_wire(client.request("hello")), indent=2))
             return 0
-        device = SimDevice(args.kind, args.device_id, axes=args.axes, hz=args.hz)
+        device = SimDevice(
+            args.kind,
+            args.device_id,
+            axes=args.axes,
+            hz=args.hz,
+            exit_policy=args.exit_policy,
+        )
         server = HalServer(
             device,
             args.endpoint_dir,
@@ -51,7 +62,7 @@ def main(argv=None):
         )
 
         def stop(_signum, _frame):
-            server.stopping = True
+            server.stop()
 
         signal.signal(signal.SIGTERM, stop)
         signal.signal(signal.SIGINT, stop)

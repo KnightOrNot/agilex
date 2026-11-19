@@ -30,3 +30,6 @@ dist/
 
 # Project data
 /data/
+
+# Machine-specific hardware deployments
+/config/*.local.toml

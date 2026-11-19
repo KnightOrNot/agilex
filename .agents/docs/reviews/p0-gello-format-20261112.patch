@@ -1,0 +1,117 @@
+diff --git a/src/agilex_gello_software/cli.py b/src/agilex_gello_software/cli.py
+index 4d05a9a..9e32c2d 100644
+--- a/src/agilex_gello_software/cli.py
++++ b/src/agilex_gello_software/cli.py
+@@ -18,20 +18,35 @@ class Command:
+ 
+ 
+ COMMANDS: dict[str, Command] = {
+-    "read": Command("agilex_gello_software.commands.read", "read GELLO joints and gripper"),
+-    "follow": Command("agilex_gello_software.commands.follow", "control PiPER-X with GELLO"),
++    "read": Command(
++        "agilex_gello_software.commands.read", "read GELLO joints and gripper"
++    ),
++    "follow": Command(
++        "agilex_gello_software.commands.follow", "control PiPER-X with GELLO"
++    ),
+     "follow-record": Command(
+-        "agilex_gello_software.commands.follow_record", "control PiPER-X and record raw episodes"
++        "agilex_gello_software.commands.follow_record",
++        "control PiPER-X and record raw episodes",
++    ),
++    "movejs": Command(
++        "agilex_gello_software.commands.movejs", "move PiPER-X through its JS channel"
+     ),
+-    "movejs": Command("agilex_gello_software.commands.movejs", "move PiPER-X through its JS channel"),
+     "launch-yaml": Command(
+-        "agilex_gello_software.commands.launch_yaml", "launch from a YAML configuration", "tyro"
++        "agilex_gello_software.commands.launch_yaml",
++        "launch from a YAML configuration",
++        "tyro",
+     ),
+     "launch-nodes": Command(
+-        "agilex_gello_software.commands.launch_nodes", "launch a robot ZMQ server", "tyro", "robots"
++        "agilex_gello_software.commands.launch_nodes",
++        "launch a robot ZMQ server",
++        "tyro",
++        "robots",
+     ),
+     "camera-server": Command(
+-        "agilex_gello_software.commands.camera_server", "serve RealSense cameras", "tyro", "camera"
++        "agilex_gello_software.commands.camera_server",
++        "serve RealSense cameras",
++        "tyro",
++        "camera",
+     ),
+     "camera-client": Command(
+         "agilex_gello_software.commands.camera_client",
+@@ -40,10 +55,16 @@ COMMANDS: dict[str, Command] = {
+         "camera",
+     ),
+     "quick-run": Command(
+-        "agilex_gello_software.commands.quick_run", "run the upstream quick workflow", "tyro", "full"
++        "agilex_gello_software.commands.quick_run",
++        "run the upstream quick workflow",
++        "tyro",
++        "full",
+     ),
+     "run-env": Command(
+-        "agilex_gello_software.commands.run_env", "run a configured GELLO environment", "tyro", "full"
++        "agilex_gello_software.commands.run_env",
++        "run a configured GELLO environment",
++        "tyro",
++        "full",
+     ),
+ }
+ 
+@@ -75,14 +96,17 @@ def main(argv: Sequence[str] | None = None) -> int:
+         if command.parser == "tyro":
+             import tyro
+ 
+-            parsed = tyro.cli(module.Args, prog=f"agilex-gello-software {name}", args=args)
++            parsed = tyro.cli(
++                module.Args, prog=f"agilex-gello-software {name}", args=args
++            )
+             result = module.main(parsed)
+         else:
+             result = module.main(args)
+     except ModuleNotFoundError as exc:
+         if command.extra:
+             print(
+-                f"agilex-gello-software {name}: missing optional dependency {exc.name!r}; "
++                f"agilex-gello-software {name}: "
++                f"missing optional dependency {exc.name!r}; "
+                 f"run `uv sync --extra {command.extra}`",
+                 file=sys.stderr,
+             )
+diff --git a/src/agilex_gello_software/paths.py b/src/agilex_gello_software/paths.py
+index ca0aeba..f4daebe 100644
+--- a/src/agilex_gello_software/paths.py
++++ b/src/agilex_gello_software/paths.py
+@@ -14,7 +14,9 @@ def project_root() -> Path:
+     if (checkout / "pyproject.toml").is_file():
+         return checkout
+     cwd = Path.cwd()
+-    if (cwd / "pyproject.toml").is_file() and (cwd / "src" / "agilex_gello_software").is_dir():
++    if (cwd / "pyproject.toml").is_file() and (
++        cwd / "src" / "agilex_gello_software"
++    ).is_dir():
+         return cwd
+     raise RuntimeError(
+         "Cannot locate GELLO; set GELLO_PROJECT_ROOT to its repository root."
+diff --git a/tests/test_raw_episode_recorder.py b/tests/test_raw_episode_recorder.py
+index effb2d7..d2e55b5 100644
+--- a/tests/test_raw_episode_recorder.py
++++ b/tests/test_raw_episode_recorder.py
+@@ -4,7 +4,10 @@ import unittest
+ from datetime import datetime, timezone
+ from pathlib import Path
+ 
+-from agilex_gello_software.data_utils.raw_episode_recorder import RawEpisodeRecorder, RecordingError
++from agilex_gello_software.data_utils.raw_episode_recorder import (
++    RawEpisodeRecorder,
++    RecordingError,
++)
+ 
+ 
+ class RawEpisodeRecorderTest(unittest.TestCase):

@@ -18,7 +18,7 @@ class AppConfig:
     max_skew_ms: float = 50.0
     queue_size: int = 90
     watchdog_s: float = 1.0
-    position_tolerance_deg: float = 1.1
+    position_tolerance_deg: float = 1.5
     preview_depth_max_m: float = 3.0
     preview_cloud_stride: int = 4
     camera_enabled: bool = True

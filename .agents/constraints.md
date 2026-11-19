@@ -1,27 +1,25 @@
-# 约束与授权
+# Authorization and Constraints
 
-## 工作区与发布
+## Workspace and external actions
 
-- 保留用户工作，不覆盖已有修改。不做破坏性操作、远端变更、发布、对外发送、付费或生产操作，除非已有相应授权；已有授权不重复确认。
-- 未明确要求不提交、不推送、不发布；既往已完成的发布授权不自动延伸到本次改动。
-- 密钥、密码、token、环境、缓存和采集数据不入 Git，也不写入日志/文档；证据只记录脱敏身份、结果和路径。
-- 不隐藏失败，不削弱测试或验收标准，不引入当前需求之外的依赖、抽象或重构，不预建空目录/占位文档。
+- Preserve user edits. Obtain authorization for destructive operations, remote changes, releases, outbound messages, paid work, or production actions. Reuse authorization already given for the current scope.
+- Do not commit, push, or release without authorization. Earlier one-time exceptions do not carry over. Using a skill, receiving a recommendation, or passing a check grants no authorization; follow the [Git workflow](git.md) for acceptance and branch rules.
+- Keep secrets, credentials, local environments, caches, and capture data out of Git. Keep sensitive details out of logs and docs; record redacted identity, results, and evidence locations where needed.
+- Report failures honestly. Do not weaken checks or introduce unrelated dependencies, abstractions, or restructuring. Create directories and documents only when they hold useful content.
 
-- 技能启用、建议、计划或检查通过均不构成授权；附带 commit/push/部署必须服从 [git.md](git.md) 的任务范围、实测确认和分支门槛。本次 main 例外不授权后续直接推送。
+## Hardware and motion
 
-## 硬件与控制
+- Use fake devices, synthetic RGB-D, and local IPC for software tests and CI. Do not access CAN, serial, or cameras during these tests.
+- Obtain the relevant authorization for CAN configuration, device access, motion, calibration, and force/torque comparison. See the [testing record](docs/stages/testing.md) for scope and evidence. Permission to configure a host interface does not authorize enabling or moving hardware. A user running a script does not authorize the agent to reproduce the motion.
+- Show the target and obtain `yes` before motion. Preserve the browser's unchecked confirmation, backend guard, task and state checks, and duplicate-start protection.
+- Motion requires an operator present, a secured arm, a clear workspace, and an available emergency stop. Stop on unexpected displacement, invalid feedback, or jumps. Do not automatically calibrate, subtract offsets, switch control mode, or loosen the arrival tolerance.
+- Keep the shared hardware lock across entry points. Do not delete the lock to bypass protection, terminate user-owned services, or clean up anything beyond identified processes this run created.
+- Follow the existing JS cleanup policy. Do not automatically reset or disable the arm. Inspect current SDK behavior before using a path other than `read` for read-only work. GELLO initialization via `agilex-controller read` writes torque-off; use only PING/READ for a strictly read-only GELLO probe.
+- Force estimates are read-only by default. Closed-loop use requires a design for filtering, saturation, deadband, watchdogs, and force and torque limits. Research formulas alone do not constitute a controller.
 
-- 软件测试/CI 只用 fake、合成 RGB-D 和本地 IPC，不访问 CAN、串口或相机。
-- CAN 配置、设备访问、运动、标定、F/T 对比均需对应授权；授权范围和实际结果见 [当前测试记录](docs/stages/testing.md)。允许配置主机接口不等于允许使能或运动；用户自行运行脚本不等于授权代理复现运动。
-- 保留每次运动前的目标显示和 `yes`；浏览器保留未勾选的确认、后端 guard、任务/状态校验及防重复启动。
-- 运动需操作员在场、机械臂固定、空间清空、急停可用；偏差、异常反馈或跳变立即停止。不自动标定、扣 offset、改控制模式或放宽到位容差。
-- 两入口共用互斥锁，不并发控制同一硬件；不通过删除锁绕过保护，不结束用户已有服务，只清理本次创建且身份明确的进程。
-- 退出遵守现有 JS 清理，不自动 reset 或失能；当前 SDK `read` 之外的具体行为以实现为准。GELLO 的 `agilex-controller read` 初始化会写扭矩关闭，不用于严格只读审计；严格只读主手探针只允许 PING/READ。
-- 力估计输出默认只读；进入闭环前必须完成低通、限幅、死区、看门狗和力/力矩上限设计，不能把研究公式直接当成可运行控制器。
+## Data and external services
 
-## 数据与外部服务
-
-- `data/raw/` 不可变，不删除、覆盖或手改 partial 来冒充完成。合成输入与操作员数据分开；`data/lerobot/` 是可重建派生物，仍不能无授权删除。
-- 保留原生 Z16、标定、单调时钟来源和保存/丢弃审计；preview 不改变采集数据。
-- HF 上传须用户主动触发并认证；禁止以测试名义真实发布。应用本地删除仅限配置根内的派生数据并保留活动会话保护，不提供 Hub 删除。
-- 远程桌面配置/开放端口/持久权限变更需要相应授权，不将 SSH 检查或 RDP 连接成功等同于机器人安全或运动通过。
+- Treat `data/raw/` as immutable. Do not remove or overwrite it, or edit partial data to look complete. Keep synthetic and operator data separate. `data/lerobot/` is reproducible output and still requires authorization to delete.
+- Preserve native Z16, calibration, monotonic clock provenance, and save/discard records. Preview cannot modify captured data.
+- Hugging Face uploads must be initiated and authenticated by the user. Do not publish to test an upload. The application may delete only derived output inside the configured root and must protect active sessions. It provides no Hub deletion.
+- Remote desktop configuration, exposed ports, and persistent permission changes need their own authorization. A successful SSH or RDP connection is not evidence of robot safety or motion acceptance.

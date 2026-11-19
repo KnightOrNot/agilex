@@ -6,6 +6,8 @@ Both entry points share [config/default.toml](../../../config/default.toml). Exp
 
 ## Robot and safety
 
+The simulation runtime reads `[runtime]`, `[record]`, `[motion]`, device deployments and stream policies from the same defaults. See the [runtime simulation guide](../runtime-simulation.md) for layering, examples and deadlines.
+
 ```toml
 [robot]
 host = "127.0.0.1"
@@ -120,7 +122,7 @@ dataset_fps = 30
 max_skew_ms = 50.0
 queue_size = 90
 watchdog_s = 1.0
-position_tolerance_deg = 1.1
+position_tolerance_deg = 1.5
 preview_depth_max_m = 3.0
 preview_cloud_stride = 4
 camera_enabled = true
@@ -130,7 +132,7 @@ depth_enabled = true
 
 This table belongs to the browser. Empty hardware_config uses hardware sections from this shared file; an explicit alternate path is still validated by the controller loader. Data_root defaults to `data/lerobot/app`. Control/sample rates, queue size and cloud stride must be positive integers, with `dataset_fps <= control_hz`.
 
-`max_skew_ms` bounds host-monotonic differences between RGB/depth and robot feedback. Watchdog controls heartbeat timeout. The browser's per-axis positioning acceptance is configured as 1.1° for startup zeroing, alignment and exit zeroing; CLI `move_js` independently defaults to 1.0°. Do not subtract offsets, switch motion mode or recalibrate automatically to hide errors.
+`max_skew_ms` bounds host-monotonic differences between RGB/depth and robot feedback. Watchdog controls heartbeat timeout. Startup zeroing, alignment and exit zeroing use a common per-axis 1.5° arrival baseline in CLI, Web and the new runtime, as authorized on 2026-11-17 without further tolerance experiments. The browser setting is `collection.position_tolerance_deg`, the runtime setting is `motion.position_tolerance_deg`, and CLI `movejs` accepts `--tolerance-deg`. P0 retains its original criteria and measured residuals. Do not subtract offsets, switch motion mode or recalibrate automatically to hide errors.
 
 Camera/depth flags control device acquisition. Mode is auto/fast/slow/manual; auto probes 640×360@90 then falls back, manual uses `[camera]`. Depth color range/cloud stride are display-only and do not change datasets or raw `.npy` files.
 

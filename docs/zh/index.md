@@ -9,6 +9,7 @@
 - [CLI](reference/cli.md)、[配置](reference/config.md)与[子模块配置](reference/submodule-config.md)
 - [相机与同步](cameras.md)、[故障排查](reference/errors.md)
 - [HAL 契约与无硬件仿真（P1）](hal-simulation.md)
+- [统一 runtime、录制与回放（P2）](runtime-simulation.md)
 - [项目首页](../../README.zh-CN.md)与[贡献指南](../../CONTRIBUTING.zh-CN.md)
 
 项目有两个并列入口，共用设备配置、硬件互斥锁和底层客户端：命令行 controller
@@ -119,3 +120,5 @@ raw v1/v2 的关节行包含：
 | Camera | [README](../../third-party/camera-realsense-d455f/README.md) / [采集 API](../../third-party/camera-realsense-d455f/docs/stream.md) | [CONTRIBUTING](../../third-party/camera-realsense-d455f/CONTRIBUTING.md) |
 | Converter | [README](../../third-party/lerobot-converter/README.md) / [数据流](../../third-party/lerobot-converter/docs/index.md) | [CONTRIBUTING](../../third-party/lerobot-converter/CONTRIBUTING.md) |
 | Adapters | [README](../../third-party/agilex-adapters/README.md) | 未提供 |
+
+- [真实 HAL 开发与验收（P3）](hardware-hal.md)

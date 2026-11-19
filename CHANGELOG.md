@@ -1,6 +1,42 @@
 # Changelog
 
-All notable changes are recorded here in Keep a Changelog format. Version 0.2.2 is a dev test candidate awaiting physical-device acceptance, not a stable release.
+All notable changes are recorded here in Keep a Changelog format. Version 0.2.4 is an unreleased development candidate; hardware acceptance remains pending.
+
+## 0.2.4 — Unreleased
+
+### Added
+
+- Added isolated PiPER-X, GELLO and RealSense HAL wrappers with explicit preparation effects, separate motion authorization, SDK/source timestamps and native RGB-D calibration provenance.
+- Added strict hardware backend deployment settings, per-device interpreters, final descriptor/metadata checks, and explicit guarded PiPER-X startup/exit zeroing.
+- Added offline driver/IPC tests, frozen protocol extras for device environments, bilingual deployment documentation and a physical acceptance runbook; hardware acceptance remains pending.
+
+### Fixed
+
+- Kept local authority watchdogs active during blocked driver operations; late authorization/submission cannot restore revoked authority.
+- Recheck authority before SDK writes, require interactive confirmation for physical following, and prevent return-to-zero cleanup from re-enabling the arm.
+- Preserve relative virtual environment paths when resolving device interpreters.
+- Preserved legacy camera wire decoding and wire shape when provenance is absent, and independently verified raw calibration references and clock mappings.
+- Closed GELLO resources after initial state-read failure and returned backend authorization errors without terminating the HAL service.
+
+## 0.2.3 — Development candidate
+
+### Added
+
+- Added `agx-runtime` for simulated sensor-only and teleoperation sessions, shared configuration, descriptor-driven safety, explicit confirmation, alignment and independently supervised HALs.
+- Added full/sampled recording with producer episode boundaries, shared finish deadlines, native RGB8/Z16 and force data, raw v3 integrity checks and deterministic sample/command replay.
+- Added an owner-private command/status service with client heartbeat protection and examples for two cameras plus force, four-axis testing and extended teleoperation.
+- Added subprocess, IPC, failure-injection and replay tests, plus bilingual runtime documentation. P0 baseline measurements are accepted; physical HAL integration remains pending.
+
+### Changed
+
+- Extracted shared local transport into `agx_transport`, retaining the simulator's compatibility imports.
+- Set simulated recording finish defaults to 1 second for boundary confirmation and 5 seconds for drain/commit, pending measured throughput review.
+- Unified CLI, Web and runtime arrival tolerance defaults at the operator-approved 1.5° baseline, preserving original P0 criteria and residuals without additional tolerance experiments.
+
+### Fixed
+
+- Made recording failure terminal, isolated unavailable optional streams, closed abandoned producer episodes on lease loss, and rejected empty or structurally incomplete sampled recordings.
+- Prevented another target after a stop request and removed unused command/subscription channels and repeated context creation from management RPCs.
 
 ## 0.2.2 — Development candidate
 

@@ -12,7 +12,7 @@ English | [简体中文](../../zh/reference/errors.md)
 | SDK endpoint cannot bind | Stop the conflicting owned workflow normally or explicitly select an existing server; do not attach accidentally |
 | RPC timeout/incomplete feedback | Check actual CAN/power/estop state, bitrate, bus traffic and endpoint; do not continue with stale state |
 | Startup joint mismatch | Inspect calibration, multi-turn branch and leader/follower position; do not bypass error checks |
-| JS positioning failed | Inspect six-axis feedback and residuals; CLI defaults to 1.0°, browser uses its configured 1.1° |
+| JS positioning failed | Inspect six-axis feedback and residuals; CLI, browser and runtime default to the shared 1.5° per-axis arrival baseline |
 
 ```bash
 ip -details -statistics link show can0

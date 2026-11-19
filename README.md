@@ -2,7 +2,7 @@
 
 English | [简体中文](README.zh-CN.md)
 
-Teleoperate an AgileX PiPER-X with a GELLO leader and collect RealSense D455F RGB-D datasets. All six projects use uv-managed Python 3.12 and independent frozen environments.
+Teleoperate an AgileX PiPER-X with a GELLO leader and collect RealSense D455F RGB-D datasets. The root and six pinned submodules use uv-managed Python 3.12 and frozen environments.
 
 | Entry point | Purpose | Output |
 | --- | --- | --- |
@@ -17,7 +17,8 @@ Both are first-class workflows. They share `config/default.toml` and the hardwar
 - Native Z16, calibration and monotonic timestamp provenance.
 - RGB, depth, side-by-side and interactive point-cloud browser previews.
 - LeLab browsing, local merge/delete and explicitly triggered Hugging Face upload.
-- Five pinned submodules under `third-party/`, with separate SDK, GELLO, camera, converter and adapter responsibilities.
+- Six pinned submodules under `third-party/`, with separate SDK, GELLO, camera, converter, adapter and contract responsibilities.
+- The development `agx-runtime` supports synthetic sensor-only/following sessions, full/sampled raw v3 recording and verified replay.
 
 ## Install
 
@@ -45,6 +46,8 @@ Physical following requires the documented calibration, device checks and operat
 
 ## Development
 
+For the P2 runtime on this development branch, see the [runtime simulation guide](docs/en/runtime-simulation.md). Existing physical workflows retain their own implementations, with the common 1.5° default arrival baseline.
+
 ```bash
 make sync
 make verify
@@ -58,9 +61,12 @@ These targets synchronize the root environment and run real style, documentation
 - [Installation](docs/en/installation.md) · [Usage](docs/en/usage.md)
 - [CLI](docs/en/reference/cli.md) · [Configuration](docs/en/reference/config.md)
 - [Submodule configuration](docs/en/reference/submodule-config.md)
+- [Unified runtime simulation and raw replay (P2)](docs/en/runtime-simulation.md)
 - [RGB-D and timing](docs/en/cameras.md) · [Troubleshooting](docs/en/reference/errors.md)
 - [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
 ## License
 
 A project-wide license for newly authored code has **not been selected**. [LICENSE](LICENSE) records this status; it does not grant additional rights. Third-party notices remain in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and each submodule retains its own license.
+
+[Physical HAL development and acceptance](docs/en/hardware-hal.md)

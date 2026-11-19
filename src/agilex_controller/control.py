@@ -224,7 +224,7 @@ def move_js(
     gripper: float | None = None,
     step_rad: float = 0.02,
     period: float = 0.02,
-    tolerance_deg: float = 1.0,
+    tolerance_deg: float = 1.5,
     check_health: Callable[[], None] | None = None,
 ) -> None:
     """Small-step JS positioning and feedback verification, without mode resets."""

@@ -211,3 +211,27 @@ def test_world_accessible_endpoint_directory_is_rejected(tmp_path):
     os.chmod(tmp_path, 0o755)
     with pytest.raises(ValueError, match="private"):
         server.HalServer(device, tmp_path)
+
+
+def test_hal_sockets_are_private_as_soon_as_bind_returns(tmp_path, monkeypatch):
+    from agx_sim.devices import SimDevice
+    from agx_sim.server import HalServer
+
+    modes = []
+    original = zmq.Socket.bind
+
+    def observed_bind(socket, address):
+        original(socket, address)
+        path = address.removeprefix("ipc://")
+        modes.append(stat.S_IMODE(os.stat(path).st_mode))
+
+    monkeypatch.setattr(zmq.Socket, "bind", observed_bind)
+    previous = os.umask(0o022)
+    server = None
+    try:
+        server = HalServer(SimDevice("camera", "cam"), tmp_path / "cam")
+        assert modes == [0o600, 0o600, 0o600]
+    finally:
+        if server is not None:
+            server.close()
+        os.umask(previous)

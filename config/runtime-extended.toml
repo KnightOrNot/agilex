@@ -1,0 +1,81 @@
+# P2 synthetic devices only; physical HALs are not supported by this entrypoint.
+[runtime]
+leader = "leader"
+follower = "arm"
+
+[record]
+mode = "full"
+
+[[devices]]
+device_id = "leader"
+kind = "leader"
+
+[[devices]]
+device_id = "arm"
+kind = "follower"
+
+[[devices]]
+device_id = "front"
+kind = "camera"
+
+[[devices]]
+device_id = "side"
+kind = "camera"
+
+[[devices]]
+device_id = "force"
+kind = "wrench"
+
+[[streams]]
+device_id = "leader"
+stream = "joints"
+role = "control_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+
+[[streams]]
+device_id = "leader"
+stream = "gripper"
+role = "control_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+
+[[streams]]
+device_id = "arm"
+stream = "joints"
+role = "control_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+
+[[streams]]
+device_id = "arm"
+stream = "gripper"
+role = "control_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+
+[[streams]]
+device_id = "front"
+stream = "rgb"
+role = "record_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+
+[[streams]]
+device_id = "front"
+stream = "depth"
+role = "record_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+
+[[streams]]
+device_id = "side"
+stream = "rgb"
+role = "record_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+
+[[streams]]
+device_id = "side"
+stream = "depth"
+role = "record_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]
+
+[[streams]]
+device_id = "force"
+stream = "wrench"
+role = "record_required"
+monitor_when = ["READY", "ALIGN", "FOLLOWING", "RECORDING"]

@@ -12,6 +12,8 @@ Common options can follow the subcommand. Editable installations infer their che
 
 ## Commands
 
+The development `agx-runtime` entrypoint provides simulated `run`, `serve`, `request`, `check` and `replay`; see the [P2 runtime guide](../runtime-simulation.md).
+
 | Command | Behavior |
 | --- | --- |
 | `config` | Print effective configuration JSON |
@@ -75,9 +77,9 @@ R starts, S saves, D discards, P shows state and H help. Single-key controls req
 uv run agilex-controller movejs --joints 0 0 0 0 0 0 --gripper 0.5
 ```
 
-Requires a running SDK server. Supports host/port aliases, `--request-timeout-s`, six-radian `--joints` (default zeros), `--gripper` (0..1, default current), `--step-rad` (0.02), `--period` (0.02 s) and `--tolerance-deg` (1.0). It checks final feedback and fails if outside tolerance.
+Requires a running SDK server. Supports host/port aliases, `--request-timeout-s`, six-radian `--joints` (default zeros), `--gripper` (0..1, default current), `--step-rad` (0.02), `--period` (0.02 s) and `--tolerance-deg` (1.5). It checks final feedback and fails if outside tolerance.
 
-This direct positioning command does not start a server or provide managed-follow confirmation/exit zeroing. The browser's configured 1.1° is separate from this CLI default.
+This direct positioning command does not start a server or provide managed-follow confirmation/exit zeroing. The CLI, browser and new runtime share the operator-approved 1.5° default arrival baseline.
 
 ## Convert
 

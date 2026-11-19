@@ -10,6 +10,7 @@ The CLI controller and browser collection app are parallel entry points sharing 
 - [CLI](reference/cli.md), [configuration](reference/config.md) and [submodule configuration](reference/submodule-config.md)
 - [RGB-D and timing](cameras.md), [troubleshooting](reference/errors.md)
 - [HAL contracts and hardware-free simulation (P1)](hal-simulation.md)
+- [Unified runtime, recording and replay (P2)](runtime-simulation.md)
 - [Project home](../../README.md) and [contributing](../../CONTRIBUTING.md)
 
 ## Ownership
@@ -92,3 +93,5 @@ Browser `data/raw/app/` is a separate audit format, paired with direct `data/ler
 | Camera | [README](../../third-party/camera-realsense-d455f/README.md) / [stream API](../../third-party/camera-realsense-d455f/docs/stream.md) | [Guide](../../third-party/camera-realsense-d455f/CONTRIBUTING.md) |
 | Converter | [README](../../third-party/lerobot-converter/README.md) / [data flow](../../third-party/lerobot-converter/docs/index.md) | [Guide](../../third-party/lerobot-converter/CONTRIBUTING.md) |
 | Adapters | [README](../../third-party/agilex-adapters/README.md) | Not provided |
+
+- [Physical HAL development (P3)](hardware-hal.md)

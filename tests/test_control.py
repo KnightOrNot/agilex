@@ -88,6 +88,63 @@ def test_js_positioning_uses_small_steps_and_keeps_gripper(robot_server):
     assert np.all(commands[:, 6] == 0.8)
 
 
+@pytest.mark.parametrize("residual_deg", [1.4, 1.6])
+@pytest.mark.parametrize("entry", ["workflow", "movejs", "web", "web-config"])
+def test_default_positioning_accepts_1_4_degrees_but_rejects_1_6(
+    monkeypatch, residual_deg, entry
+):
+    import itertools
+    from pathlib import Path
+
+    from agilex_controller import control, robot_client
+    from agilex_controller.cli import main
+    from agilex_data_collection.config import AppConfig
+    from agilex_data_collection.worker import Hardware
+
+    class FixedFeedback:
+        def get_joint_state(self):
+            state = np.zeros(7)
+            state[2] = np.deg2rad(residual_deg)
+            return state
+
+        def command_joint_state(self, command):
+            pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            pass
+
+    robot = FixedFeedback()
+    clock = itertools.count()
+    monkeypatch.setattr(control.time, "monotonic", lambda: float(next(clock)))
+    monkeypatch.setattr(control.time, "sleep", lambda _: None)
+    root = Path(__file__).resolve().parents[1]
+    if entry == "movejs":
+        monkeypatch.setattr(robot_client, "RobotClient", lambda *_args: robot)
+        assert main(["movejs"]) == (0 if residual_deg < 1.5 else 1)
+    else:
+
+        def position():
+            if entry == "workflow":
+                move_js(robot, np.zeros(6))
+            else:
+                app = (
+                    AppConfig.load(root / "config/default.toml")
+                    if entry == "web-config"
+                    else AppConfig()
+                )
+                Hardware(root, app)._position(robot, np.zeros(6), "startup_zero")
+
+        if residual_deg < 1.5:
+            position()
+        else:
+            with pytest.raises(RuntimeError, match="error=1.600"):
+                position()
+    assert np.rad2deg(robot.get_joint_state()[2]) == pytest.approx(residual_deg)
+
+
 def test_alignment_rejects_large_startup_difference(robot_server, config):
     class Leader:
         def align_to(self, *_args):

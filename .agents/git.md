@@ -1,40 +1,31 @@
-# Git 与多仓约定
+# Git Workflow
 
-## 分支与日常迭代
+## Branches and acceptance
 
-- `main` 是已发布稳定代码，不直接提交，只经明确授权的发布/热修复流程合并；用户会配置远端保护，不绕过规则或强制推送。
-- `dev` 是日常开发集成分支，不直接修改。每次先同步工作区与远端 dev，保留已有修改，再从 dev 新建 `dev-<任务名>` 工作分支。
-- 工作分支完成修改、版本与文档准备后，执行 `make lint`、`make test` 和本次所需其他检查。
-- 在当前对话提供待测版本、摘要、自动化结果及实物测试步骤，等待用户明确确认本次内容实测通过。确认前不创建任何 commit（包括文档/计划/临时检查点），不合并；不得用用户沉默代替结论。
-- 确认后在工作分支提交实现、测试、版本和文档，再合并 dev；dev 前进或冲突解决影响验证时重新检查，影响实测结论时重新取得用户确认。
-- dev 合并不自动发布 main、打标签或部署。后续发布/热修复的合并方式、分支清理规则待确认。
+- `main` holds released, stable code. Do not commit directly to it, bypass branch protection, or force push. Merge only through an authorized release or hotfix workflow.
+- `dev` integrates verified work. For a new iteration, synchronize with remote `dev` while preserving existing changes, then start an independent `dev-<task>` branch. Keep edits, verification, and commits on that branch.
+- Prepare the candidate version, changelog, and description. Run `make lint`, `make test`, and any required checks. Resolve failures and disclose checks that did not run before committing.
+- Provide the candidate version, changes, automated results, and field test steps in the current conversation. Wait for explicit confirmation that field testing passed before any commit, including docs, plans, or checkpoints, or any merge. Silence is not acceptance.
+- After confirmation, commit the implementation, tests, version, and related docs on the task branch, then merge into `dev`. If `dev` advances or conflict resolution changes the verified result, rerun relevant checks and obtain field confirmation again when the change affects it.
+- Merging into `dev` does not release to `main`, tag a release, or deploy. Release and hotfix merge details and branch cleanup rules still need confirmation. Prefer a fast-forward when possible; review diverged branches before deciding. Branch deletion requires explicit authorization.
 
-## 版本与记录
+## Versions and change records
 
-- 每次小版本迭代在提交前将 `project.version` 最后一段加 1，一次迭代只加一次；测试修复、检查重试、等待实测和合并不重复升版。
-- 英文 CHANGELOG 新增该小版本的实际变更并保留历史，开发迭代标明未发布，不虚构发布日期。
-- 英文 description 概括实际项目能力，不写未实现功能；锁文件仅通过 uv 更新。
-- 技能的默认提交频率、版本策略和合并目标服从上述门槛；技能建议或自动化通过不构成实测确认/发布授权。
+- Increment the final component of `project.version` once per patch iteration before committing. Fixes, test retries, waiting for acceptance, and merging do not increment it again. Check for version collisions if `dev` moves.
+- Record actual changes in the English changelog and preserve history. Mark an unreleased candidate as such. Describe current capabilities accurately in the English `project.description`, and update lockfiles only through uv.
+- Use a short English imperative and a conventional prefix for a commit. Keep one independently verifiable change together with its tests and documentation. A PR describes the change, version, verification, field results, risks, and related issues.
+- Skill defaults do not override the version, acceptance, commit, or release rules.
 
-## 本次迁移例外（2026-11-08）
+## Submodules and publishing
 
-用户明确允许本次按新版 HABITS 重建规范后直接 commit/push main，并说明这是 main 最后一次开放直接修改。此例外只覆盖当前规范迁移、必要检查和 0.2.1 元数据；不执行或声称通过实物测试，不扩展至后续迭代。此次同步完成后以同一内容初始化 dev，后续执行上述工作分支与确认门槛。五个子模块不改版本/分支/引用；它们的开发分支按实际修改时单独准备。
+- For normal initialization use `git submodule sync --recursive` and `git submodule update --init` to check out the parent pins. Use `--remote --merge` only for an explicitly requested upgrade. The five original submodules use `main` for such upgrades; `agilex-contract` tracks `dev`. Normal initialization still checks out the recorded commit.
+- When relocating a submodule, back up and recreate its `.venv` rather than rewriting shebangs. Parent, child, and neighboring checkouts do not synchronize automatically.
+- Test the submodules, obtain authorization to commit and push them, update the parent gitlinks, verify the parent, then publish the parent if authorized. A published gitlink must refer to a commit reachable by users.
+- Keep local environments, caches, build output, environment or credential files, and capture data out of Git. Track the shared `.agents/` docs, routing index, hooks, and workflows.
 
-## 子模块、提交与发布
+## Historical exceptions
 
-- 普通初始化：`git submodule sync --recursive`，然后 `git submodule update --init`，检出父仓固定提交；只有明确升级才使用 `--remote --merge`。原五个子模块的远程升级分支为 `main`；新增 `agilex-contract` 待测快照跟踪 `dev`，普通初始化仍检出父仓固定的 gitlink。
-- 移动子模块后备份并重建 `.venv`，不修补绝对 shebang。父项目、子模块和相邻独立工作副本互不自动同步。
-- 一次提交一项可验证变更；用简洁英文祈使句及 conventional prefix，说明内容与原因。行为、必要测试与对应文档组成同一个可审阅变更。
-- 发布顺序：子模块测试 → 授权提交并推送子模块 → 更新父 gitlink → 验证父项目 → 授权发布父仓。不得发布远端无法取得的 gitlink。
-- PR 说明具体问题和最终行为、涉及仓库/版本、实际验证、硬件状态、风险与相关 issue；模板只收集审阅需要的信息。
-- 可快进时优先普通 fast-forward；分叉时先审阅差异再决定，不默认 force push。删除分支需明确授权，不动未涉及的其他分支。
-- `.gitignore` 分类维护，忽略 `.venv`、缓存、构建、本地环境/凭据和数据；共享 `.agents/`、规范索引、钩子与工作流进入版本控制。
+- **2026-11-08:** The user authorized the final direct commit and push to `main` for the previous HABITS migration, its checks, and version 0.2.1. The same commit initialized `dev`. This did not assert a hardware result or change the five original submodule pins. See [ADR 0003](docs/decisions/0003-habits-branch-gates.md).
+- **2026-11-11:** The user authorized distributing the 0.2.2 candidate before field testing so the lab machine could pull it from GitHub. The requested contract repository was `git@github.com:KnightOrNot/agilex-contract.git`. The contract went to its `dev` first; the parent pinned that revision, was verified, and fast-forwarded `dev`. The original five pins and existing `main` branches stayed unchanged; no release tag or field acceptance was implied. See the [testing record](docs/stages/testing.md).
 
-历史与当前基线证据见 [ADR](docs/decisions/0001-baseline-and-validation.md) 和 [testing](docs/stages/testing.md)。
-
-
-## P1 待测版异机分发例外（2026-11-11）
-
-用户明确说明真机实验在另一台计算机进行，需要从 GitHub 拉取，因此授权本次 0.2.2 待测版在真机验收前提交、合入并推送 dev。用户还指定独立契约仓库使用 git@github.com:KnightOrNot/agilex-contract.git，并要求本地包名、导入名和目录统一改名。
-
-本次按契约子仓 dev 先发布、父仓固定 gitlink 并验证、主仓工作分支提交后快进 dev 的顺序执行。原五个子模块固定提交不变；不更新任何已有 main，不打发布标签，不代替用户作出真机通过结论。这是本次分发例外，不永久修改 HABITS 或其他迭代的默认实测门槛。
+Neither exception applies to later iterations. See the [validation baseline](docs/decisions/0001-baseline-and-validation.md) for earlier Git and environment decisions.

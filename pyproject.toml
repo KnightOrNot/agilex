@@ -1,7 +1,7 @@
 [project]
 name = "agilex-controller"
-version = "0.2.2"
-description = "CLI and browser RGB-D collection with typed HAL contracts and hardware-free device simulation"
+version = "0.2.4"
+description = "Robot teleoperation and RGB-D collection with typed HAL contracts, isolated device services, explicit motion authority and verified raw replay"
 readme = "README.md"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 authors = [
@@ -9,7 +9,7 @@ authors = [
 ]
 requires-python = ">=3.12,<3.13"
 dependencies = [
-    "agilex-contract",
+    "agilex-contract>=0.1.1",
     "agilex-gello-software",
     "camera-realsense",
     "numpy>=1.26",
@@ -21,6 +21,10 @@ dependencies = [
 agilex-controller = "agilex_controller.cli:main"
 agilex-data-collection = "agilex_data_collection:main"
 agx-sim = "agx_sim.__main__:main"
+agx-runtime = "agx_runtime.__main__:main"
+agx-hal-piperx = "agx_hal_piperx.__main__:main"
+agx-hal-gello = "agx_hal_gello.__main__:main"
+agx-hal-realsense = "agx_hal_realsense.__main__:main"
 
 [dependency-groups]
 dev = ["pytest>=8.3", "ruff>=0.9"]
@@ -46,4 +50,4 @@ requires = ["uv_build>=0.12.7,<0.13.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
-module-name = ["agilex_controller", "agilex_data_collection", "agx_sim"]
+module-name = ["agilex_controller", "agilex_data_collection", "agx_sim", "agx_transport", "agx_runtime", "agx_hal", "agx_hal_piperx", "agx_hal_gello", "agx_hal_realsense"]

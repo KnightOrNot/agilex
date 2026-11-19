@@ -123,7 +123,7 @@ Cloud is calibrated XYZ in depth-camera meters, colored by depth rather than RGB
 
 ### Positioning
 
-The browser uses collection position_tolerance_deg=1.1 for startup zero, GELLO alignment and exit zero, with the existing final-target wait. The CLI defaults to 1.0 independently. Logs identify startup_zero/gello_alignment/exit_zero and six-axis targets, start/final feedback, signed residuals, observed range and successful commands. Primary and cleanup errors remain separate.
+CLI, Web and the new runtime use a common 1.5° per-axis arrival baseline for startup zero, GELLO alignment and exit zero. The browser uses `collection.position_tolerance_deg`, the runtime uses `motion.position_tolerance_deg`, and CLI `movejs` provides `--tolerance-deg`. The operator adopted this baseline on 2026-11-17 without further tolerance experiments; P0 retains its original 1.0°/1.1° criteria and measured residuals. The existing final-target wait remains. Logs identify startup_zero/gello_alignment/exit_zero and six-axis targets, start/final feedback, signed residuals, observed range and successful commands. Primary and cleanup errors remain separate.
 
 Prior operator diagnostics found J3 zero is its upper limit (-170°..0°), with output-side residual near 1° and output/motor differences under load. Do not subtract offsets, automatically recalibrate or change modes to hide residuals. A new physical run requires operator confirmation.
 

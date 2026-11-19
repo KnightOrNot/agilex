@@ -79,7 +79,7 @@ FFmpeg/TorchCodec 问题属于 converter 环境：执行 `ffmpeg -version` 和 `
 | 8000 端口被占用 | 停止旧服务，或 `serve --port 8001` 后打开对应端口 |
 | 初始化失败、状态为 `error` | 查看网页错误和 `data/logs/<session>.log`；清理结束后排除设备权限、占用或 CAN 问题再重试 |
 | 启动时提示另一个 workflow 正在运行 | 应用锁被旧流程持有；正常退出旧流程，不要删除锁文件绕过 |
-| `startup_zero` / `exit_zero`、`JS positioning failed` | 浏览器容差为 1.1°（CLI 默认 1.0°）；查看 `[position_result]` 的六轴反馈、残差和观测范围，先做只读 `motor-status`，不跳过校验 |
+| `startup_zero` / `exit_zero`、`JS positioning failed` | CLI、浏览器和 runtime 默认每轴到位容差均为 1.5°；查看 `[position_result]` 的六轴反馈、残差和观测范围，先做只读 `motor-status`，不跳过校验 |
 | 相机快速模式不稳定 | 把 `[collection].camera_mode` 改为 `"slow"`，停止会话后重启 |
 | 深度或点云预览报错 | 确认 `depth_enabled = true` 且已进入 `following`；点云要求无畸变 rectified 深度标定 |
 | 点云不显示 | 启用浏览器 WebGL，刷新并关闭多余标签页；预览最多两个连接 |

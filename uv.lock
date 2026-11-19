@@ -4,7 +4,7 @@ requires-python = "==3.12.*"
 
 [[package]]
 name = "agilex-contract"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "third-party/agilex-contract" }
 
 [package.metadata]
@@ -17,7 +17,7 @@ dev = [
 
 [[package]]
 name = "agilex-controller"
-version = "0.2.2"
+version = "0.2.4"
 source = { editable = "." }
 dependencies = [
     { name = "agilex-contract" },
@@ -52,7 +52,7 @@ dev = [
 
 [[package]]
 name = "agilex-gello-software"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "third-party/agilex-gello-software" }
 dependencies = [
     { name = "dynamixel-sdk" },
@@ -66,6 +66,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "agilex-contract", marker = "extra == 'hal'", editable = "third-party/agilex-contract" },
     { name = "cmeel-tinyxml2", marker = "extra == 'full'", specifier = ">=10,<11" },
     { name = "cmeel-tinyxml2", marker = "extra == 'simulation'", specifier = ">=10,<11" },
     { name = "cmeel-urdfdom", marker = "extra == 'full'", specifier = ">=4,<5" },
@@ -73,6 +74,7 @@ requires-dist = [
     { name = "dm-control", marker = "extra == 'full'", specifier = ">=1.0.20" },
     { name = "dm-control", marker = "extra == 'simulation'", specifier = ">=1.0.20" },
     { name = "dynamixel-sdk", specifier = "==4.0.5" },
+    { name = "msgpack", marker = "extra == 'hal'", specifier = ">=1.1" },
     { name = "mujoco", marker = "extra == 'full'", specifier = ">=3.2" },
     { name = "mujoco", marker = "extra == 'simulation'", specifier = ">=3.2" },
     { name = "numpy", specifier = ">=1.26" },
@@ -95,6 +97,7 @@ requires-dist = [
     { name = "pyspacemouse", marker = "extra == 'robots'", specifier = ">=1.1" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "pyzmq", specifier = ">=26.0" },
+    { name = "pyzmq", marker = "extra == 'hal'", specifier = ">=26.0" },
     { name = "termcolor", specifier = ">=2.4" },
     { name = "tyro", specifier = ">=0.9" },
     { name = "ur-rtde", marker = "extra == 'full'", specifier = ">=1.6" },
@@ -102,7 +105,7 @@ requires-dist = [
     { name = "xarm-python-sdk", marker = "extra == 'full'", specifier = ">=1.14" },
     { name = "xarm-python-sdk", marker = "extra == 'robots'", specifier = ">=1.14" },
 ]
-provides-extras = ["camera", "simulation", "robots", "full"]
+provides-extras = ["hal", "camera", "simulation", "robots", "full"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -118,7 +121,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/3e/38/7859ff46355f76f8d
 
 [[package]]
 name = "camera-realsense"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "third-party/camera-realsense-d455f" }
 dependencies = [
     { name = "numpy" },
@@ -131,13 +134,17 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "agilex-contract", marker = "extra == 'hal'", editable = "third-party/agilex-contract" },
+    { name = "msgpack", marker = "extra == 'hal'", specifier = ">=1.1" },
     { name = "numpy", specifier = ">=2.4.6" },
     { name = "opencv-python", specifier = ">=5.0.0.93" },
     { name = "pillow", specifier = ">=12.3.0" },
     { name = "pyrealsense2", specifier = ">=2.59.1.11053" },
     { name = "pyzmq", specifier = ">=27.2.0" },
+    { name = "pyzmq", marker = "extra == 'hal'", specifier = ">=26.0" },
     { name = "tyro", specifier = ">=1.0.16" },
 ]
+provides-extras = ["hal"]
 
 [package.metadata.requires-dev]
 dev = [

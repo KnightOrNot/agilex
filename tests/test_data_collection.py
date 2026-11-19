@@ -141,7 +141,7 @@ def test_app_configuration_shares_the_default_file():
     app = AppConfig.load(path)
     assert app.dataset_fps == 30
     assert app.control_hz == 50
-    assert app.position_tolerance_deg == 1.1
+    assert app.position_tolerance_deg == 1.5
     assert app.camera_enabled and app.depth_enabled
     assert app.hardware_config == ""  # hardware sections come from this file
     # The legacy loader ignores [collection] but still validates its own sections.

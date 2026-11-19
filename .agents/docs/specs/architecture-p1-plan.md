@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python 3.12、dataclasses、msgpack、pyzmq、pytest、uv。
 
-**Spec:** [架构基线](../../../ARCHITECTURE_v3.3.md)，重点 §5、§12、P1。
+**Spec:** [架构基线](architecture-v3.3.md)，重点 §5、§12、P1。
 
 ## Global Constraints
 

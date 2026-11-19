@@ -11,3 +11,9 @@
 - 范围限制：仅根仓规范化；独立子模块的指令、代码、环境、gitlink 和 gstack 配置不改动。规范化整理时未获提交或推送授权；用户随后授权 0.2.0 元数据和规范化改动 commit & push，具体检查见 [testing](../stages/testing.md)。不包含部署或硬件操作。
 
 后续更新：新版 HABITS 的技能索引、阶段资料保留与分支门槛见 [ADR 0003](0003-habits-branch-gates.md)，原文中的旧布局决定仅记录当时事实。
+
+## 2026-11-19: Apply English as the default
+
+The user updated [HABITS.md](../../../HABITS.md) to make English the default for documents without a specified language. The root agent and skill indexes, active project policies, and current testing summary use English. The paired English and Chinese user docs keep their existing paths. Historical ADRs, plans, reports, and original measurement records retain their source language. The P0/P3 lab handoffs remain in Chinese for the same operator workflow.
+
+The reviewed Chinese v3.3 architecture source moved from the repository root to [the specs directory](../specs/architecture-v3.3.md), alongside its implementation plans. Its requirements and acceptance gates are unchanged. This documentation migration does not change the stage, application behavior, licensing status, or any publication or hardware authorization.

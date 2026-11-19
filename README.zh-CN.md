@@ -2,7 +2,7 @@
 
 [English](README.md) | 简体中文
 
-使用 GELLO 主手遥操作 AgileX PiPER-X，并采集 RealSense D455F RGB-D 数据。六个项目统一使用 uv 管理的 Python 3.12 和各自独立的 frozen 环境。
+使用 GELLO 主手遥操作 AgileX PiPER-X，并采集 RealSense D455F RGB-D 数据。根项目和六个固定子模块使用 uv 管理的 Python 3.12 与 frozen 环境。
 
 | 入口 | 用途 | 输出 |
 | --- | --- | --- |
@@ -17,7 +17,8 @@
 - 保留原生 Z16、标定和单调时间戳来源。
 - 浏览器 RGB、深度、左右并排和交互式点云预览。
 - LeLab 浏览、本地合并/删除，以及用户主动触发的 Hugging Face 上传。
-- 五个子模块固定在 `third-party/`，SDK、GELLO、相机、converter 和 adapters 各自独立。
+- 六个子模块固定在 `third-party/`，SDK、GELLO、相机、converter、adapters 和 contract 各自独立。
+- 开发中的 `agx-runtime` 支持纯传感器/跟随仿真、full/sampled raw v3 录制和校验回放。
 
 ## 安装
 
@@ -45,6 +46,8 @@ uv run agilex-data-collection serve --simulate
 
 ## 开发
 
+本开发分支的 P2 runtime 用法见 [runtime 仿真指南](docs/zh/runtime-simulation.md)。现有真机入口继续使用各自实现，默认到位基线同为 1.5°。
+
 ```bash
 make sync
 make verify
@@ -58,9 +61,12 @@ make verify
 - [安装](docs/zh/installation.md) · [用法](docs/zh/usage.md)
 - [CLI](docs/zh/reference/cli.md) · [配置](docs/zh/reference/config.md)
 - [子模块配置](docs/zh/reference/submodule-config.md)
+- [统一 runtime 仿真与 raw 回放（P2）](docs/zh/runtime-simulation.md)
 - [RGB-D 与时间对齐](docs/zh/cameras.md) · [故障排查](docs/zh/reference/errors.md)
 - [贡献指南](CONTRIBUTING.zh-CN.md) · [英文版本记录](CHANGELOG.md)
 
 ## 许可证
 
 新编写代码的项目级许可证**尚未选定**。[LICENSE](LICENSE) 记录了这一状态，不额外授予使用权。第三方声明保留在 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)，各子模块仍使用各自许可证。
+
+[真实 HAL 开发与验收](docs/zh/hardware-hal.md)

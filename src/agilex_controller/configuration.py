@@ -277,9 +277,13 @@ def load_config(
             data = tomllib.load(stream)
     else:
         data = {}
-    # [collection] configures the separate browser app; it shares this file but
-    # is validated by agilex_data_collection.config.AppConfig.
-    unknown = data.keys() - SECTIONS.keys() - {"collection"}
+    # Shared-file sections owned and validated by the other entry points.
+    # Legacy control parameters still come exclusively from SECTIONS below.
+    unknown = (
+        data.keys()
+        - SECTIONS.keys()
+        - {"collection", "runtime", "record", "motion", "devices", "streams", "mapping"}
+    )
     if unknown:
         raise ValueError(f"unknown configuration sections: {sorted(unknown)}")
     sections = {}

@@ -1,54 +1,45 @@
-# 协作流程
+# Development Workflow
 
-## 新会话与开发循环
+## Starting work
 
-1. 先读根 [HABITS.md](../HABITS.md)、[AGENTS.md](../AGENTS.md) 和 `.ai-stage`，再按路由读取本次任务所需资料与 [SKILLS.md](../SKILLS.md) 中的相关技能；默认只读当前阶段记录。涉及分支、版本、提交、合并时先读 [git.md](git.md)。
-2. 同步工作区状态：`git status --short`、分支和 `git submodule status`；区分用户已有修改。这里的同步不等于自动 pull、checkout、reset 或升级子模块；远端写入遵守 [constraints.md](constraints.md)。
-3. 每次编辑前重新读取本地目标文件，以当前保存内容为准；出现新增用户改动时重新核对，不覆盖。
-4. 理解已有资料与实现 → 说明计划 → 在授权范围实现 → 按风险验证 → 同步用户文档与阶段记录。重要未知标 `待确认`，不编造。
-5. 收尾说明实际改动、命令、结果、失败/跳过和未验证项；未获提交授权时保留未提交。
+1. Read [HABITS.md](../HABITS.md), [AGENTS.md](../AGENTS.md), and `.ai-stage`. Load the current stage record and only the relevant project material. Read the [Git workflow](git.md) before branch, version, commit, or merge work.
+2. Check the branch, `git status --short`, and `git submodule status`. Distinguish existing work from this task. Follow the [authorization rules](constraints.md) for remote operations; a status check does not imply pulling, switching, resetting, or updating submodules.
+3. Reread the saved target before editing it. If new edits appear during the task, inspect the diff and preserve them.
+4. Understand the scope and implementation, share the approach, make authorized changes, and verify at a level that fits the risk. Label unresolved facts as pending confirmation. Sync affected user documentation and project records.
+5. Report what changed, the commands and results, any failures or skips, and what remains unverified.
 
-## 统一命令
+## Project commands
 
-在根目录运行，Python 脚本通过 `uv run --frozen` 执行：
+Run from the repository root. Make invokes Python tooling via `uv run --frozen`.
 
-| 命令 | 真实行为 |
+| Command | What it checks or does |
 | --- | --- |
-| `make sync` | uv 按 frozen lock 同步根开发环境；不更新 gitlink，不配置系统或硬件 |
-| `make lint` | 根代码与本地 agilex-contract 的 Ruff lint/format 检查，逐个检查 Shell 语法 |
-| `make test` | 根与 agilex-contract 的 pytest，包含仿真 HAL/IPC 与已有 converter 环境时的真实集成回读；缺失环境的 skip 由 pytest 明示 |
-| `make docs` | 检查基础文件、AI 路由、双语路径/语言链接、相对链接/锚点与双语命令/配置示例一致性；不访问网络 |
-| `make verify` | 汇总 lint、docs、test；任何失败均返回非零，不以占位命令代替检查 |
+| `make sync` | Synchronizes the root development environment from the lockfile without updating submodule pins or configuring the host or hardware |
+| `make lint` | Checks Ruff lint and formatting in the root project and contract, plus shell syntax for each script |
+| `make test` | Runs root and contract pytest, including simulated HAL/IPC and converter readback when the converter environment is available; pytest reports skips |
+| `make docs` | Checks required files, agent routing, paired language pages, relative links and anchors, and bilingual executable examples without network access |
+| `make verify` | Runs lint, docs, and tests; any failure returns a nonzero status |
 
-完整运行环境仍用 `./scripts/setup.sh` 和 `uv run agilex-data-collection setup`；保留子模块修改时加 `--skip-submodules`。这些命令需要网络/系统权限时应明确说明。硬件命令不在任何 Make 验证目标或 CI 中运行。
+Full setup uses `./scripts/setup.sh` and `uv run agilex-data-collection setup`. Use the setup script's `--skip-submodules` flag to preserve local submodule changes. Explain any network or system access needed for setup. Make verification and CI do not run hardware commands.
 
-跨仓更改时补跑受影响子模块的 README 检查和真实 RGB-D converter 回读。浏览器改动补跑：
+For cross-repository changes, validate the affected submodules as described in their READMEs and run real converter RGB-D readback when the change affects that integration. For browser changes, also run:
 
 ```bash
 uv run --project third-party/agilex-adapters --frozen --extra app pytest third-party/agilex-adapters/tests -q
 ```
 
-当前根没有 mypy 或覆盖率门槛；CI 不声称执行这些检查。根 CI 与本地使用同一 Make 目标；没有配置 pre-commit，不将它报告为已运行。CI 无 converter 独立环境时明确跳过 integration，不能声称覆盖六仓完整验收。
+Root CI uses the same Make targets as local development. The root has no mypy, coverage threshold, or pre-commit check. CI without a separate converter environment skips that integration; do not report full multi-repository acceptance from that run.
 
-## 阶段与证据维护
+## Stages and evidence
 
-- `.ai-stage` 只保存一个值：`PLANNING`、`CODING`、`TESTING`、`DEPLOY`。进入阶段时同步标记并创建/更新对应文档，保留已有阶段资料，不预建后续阶段。
-- 当前为 `TESTING`，只维护 [testing.md](docs/stages/testing.md)；记录范围、命令、证据等级、结果、缺陷、授权边界与下一步。
-- 已有记录与本轮实际运行分开；软件/模拟、只读硬件、操作员运行日志、运动验收不得混写。阶段名不代表通过或发布授权。
-- 关键跨阶段决策写入 `docs/decisions/` 的 ADR，并在阶段文档中链接；详细规格与分开的实施计划放 `docs/specs/` 并相互引用，长期复盘放 `docs/reviews/`。阶段文档保存结论/证据/遗留，任务步骤与勾选保留在所选技能的计划文件中，不重复维护。
-- 用户通知五小时 AI 额度剩余 15% 时立即停止新实现，将完成项、检查、失败与 TODO 写入当前阶段记录。额度无法通过工具读取，不声称自动监控。
+- Keep exactly one of `PLANNING`, `CODING`, `TESTING`, or `DEPLOY` in `.ai-stage`. When the stage changes, update its document and the root routing index. Retain previous records; create no files for stages that have not started.
+- Use the stage file routed by [AGENTS.md](../AGENTS.md) for current conclusions, evidence, open items, and any authorization boundaries. Separate software simulation, read-only hardware checks, operator logs, and actual motion acceptance. A stage label does not establish acceptance or release authorization.
+- When the user reports 15% remaining on the five-hour AI allowance, stop new implementation and record completed work, checks, failures, and next steps in the current stage document. Do not claim to monitor the allowance automatically.
 
-## AI 工具
+## Skills and records
 
-- 保留本项目全局 gstack 要求；开始任务确认安装根目录下有 `bin/`（优先 `$GSTACK_ROOT`，否则检查实际安装路径，以当前环境实际安装位置为准）。缺失时停止并说明安装方法，不绕过 gate。
-- 网页浏览使用实际可用的 gstack `/browse`；技能只按实际可用性和适用范围使用。`.claude/settings.json` 与 `check-gstack.cjs` 保持现状；缺 Node 或钩子时说明错误，不绕过。
-- 技能建议、计划和产物不构成授权。旧 gstack 初始化不得覆盖规范索引或桥接文件；本轮不改变 gstack 配置。
-- `HABITS.md` 原样保留，修改需用户授权并记录原因、范围和依据。项目规则不自动同步其他项目，临时要求不自动成为长期习惯。
-
-## 技能衔接与交付
-
-按 SKILLS 选择一个适合范围的主流程，专项技能按需补充，不叠加同类完整流程。向技能传入目标、范围、验收、Make 命令和资料位置；项目文件不复制技能正文。缺技能说明情况，完成仍可执行的项目检查。
-
-可配置的设计/计划/评审产物按 `.agents/docs/` 分类归档；工具运行文件保留其支持的路径、文件名与格式（如 planning-with-files 的三个任务文件），不擅自改名搬移。长期结论引用必要证据，清理前保留被引用资料。
-
-日常交付遵循 git.md：待测版本 → 自动化验证 → 当前对话请求用户实测 → 明确通过后工作分支 commit → 合并 dev。PR 模板记录待测版本、自动化结果、实测结论及风险。main 发布另需授权。本次直接 main 迁移例外见 git.md，不成为后续默认授权。
+- Load skills through the [skill index](../SKILLS.md). Give the selected skill the objective, scope, acceptance criteria, project commands, and output locations. Adapt examples to actual project commands. If a skill is unavailable, say so and continue the checks you can perform under the project rules.
+- Before working, verify that the installed gstack has a `bin/` directory. Check `$GSTACK_ROOT` first if set, then the actual installation path. If missing, stop and explain how to install it. For web interaction with gstack use its installed `/browse` entry. Preserve `.claude/settings.json` and `check-gstack.cjs`; report missing Node or hook errors instead of bypassing them. Older gstack setup must not overwrite project routing or bridge files.
+- Put lasting decisions in `docs/decisions/`, specs and separate linked plans in `docs/specs/`, and reviews in `docs/reviews/`, all under `.agents/`. Link from the stage record rather than duplicating decision text or checklists. Keep tool-owned task files in the tool's supported format and location. Preserve evidence still cited by project documents.
+- Preserve `HABITS.md` as supplied and record the reason, scope, and basis of any authorized change when applying it to the project. Temporary requests and skill suggestions do not automatically become permanent or transfer to another project.
+- For delivery follow the [Git workflow](git.md) and [authorization rules](constraints.md). The PR template records the candidate version, automated verification, field results, and risks.

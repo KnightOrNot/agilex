@@ -139,7 +139,7 @@ def _parser() -> argparse.ArgumentParser:
     move.add_argument("--gripper", type=float)
     move.add_argument("--step-rad", type=float, default=0.02)
     move.add_argument("--period", type=float, default=0.02)
-    move.add_argument("--tolerance-deg", type=float, default=1.0)
+    move.add_argument("--tolerance-deg", type=float, default=1.5)
     convert = commands.add_parser(
         "convert", parents=[common], help="run converter in its Python 3.12 environment"
     )

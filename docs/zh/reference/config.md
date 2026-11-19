@@ -10,6 +10,8 @@ TOML；未写字段由内置默认值补全。未知表、未知字段、非法�
 
 ## robot 与 safety
 
+仿真 runtime 从同一默认文件读取 `[runtime]`、`[record]`、`[motion]`、设备部署和流策略。配置分层、示例及期限见 [runtime 仿真指南](../runtime-simulation.md)。
+
 ```toml
 [robot]
 host = "127.0.0.1"
@@ -131,7 +133,7 @@ dataset_fps = 30
 max_skew_ms = 50.0
 queue_size = 90
 watchdog_s = 1.0
-position_tolerance_deg = 1.1
+position_tolerance_deg = 1.5
 preview_depth_max_m = 3.0
 preview_cloud_stride = 4
 camera_enabled = true
@@ -147,8 +149,10 @@ depth_enabled = true
 
 `max_skew_ms` 是 RGB、深度与机器人反馈之间允许的主机单调时钟偏差；
 `watchdog_s` 是控制心跳超时。`position_tolerance_deg` 是启动回零、GELLO 对齐和
-退出回零的每轴到位容差，浏览器当前用户授权值为 1.1°（J3 零位即机械上限，输出侧约
-0.5° 柔度）。不得通过扣除 offset、切换控制模式或自动重标定来规避超差。
+退出回零的每轴到位容差。用户于 2026-11-17 授权 CLI、Web 和新 runtime 统一采用
+1.5° 基线，不再补做容差实验。浏览器使用 `collection.position_tolerance_deg`，
+runtime 使用 `motion.position_tolerance_deg`，CLI `movejs` 可通过 `--tolerance-deg`
+显式覆盖。P0 保留原判据及实测残差。不得通过扣除 offset、切换控制模式或自动重标定来规避超差。
 
 `camera_enabled`、`depth_enabled` 控制是否打开相机与深度；`camera_mode` 取
 `auto`、`fast`、`slow` 或 `manual`，`auto` 首选 640×360@90 并按逐路实测回退，
@@ -158,4 +162,4 @@ depth_enabled = true
 独立的最小配置文件仍可使用扁平键（不写 `[collection]` 表）；多了一份
 `[collection]` 的共享文件则只读取该表。未知键会报错。
 
-CLI 的 `move_js` 默认容差仍为 1.0°，不读取 `[collection]` 的 1.1°；不要混用两条入口的验收值。
+CLI 的 `move_js` 默认容差同为 1.5°；旧入口仍保留各自配置接口，统一 runtime 的参数为 `motion.position_tolerance_deg`。
